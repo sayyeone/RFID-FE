@@ -3,48 +3,45 @@ import Login from '../pages/auth/Login';
 import PrivateRoute from './PrivateRoute';
 import RoleRoute from './RoleRoute';
 
-// Admin Pages (akan dibuat)
+// Layouts
+import AuthLayout from '../layouts/AuthLayout';
+import AdminLayout from '../layouts/AdminLayout';
+import KasirLayout from '../layouts/KasirLayout';
+
+// Admin Pages
 import AdminDashboard from '../pages/admin/Dashboard';
 import PlateManagement from '../pages/admin/PlateManagement';
 
-// Kasir Pages (akan dibuat)
+// Kasir Pages
+import KasirDashboard from '../pages/kasir/Dashboard';
 import KasirPOS from '../pages/kasir/POS';
 import KasirHistory from '../pages/kasir/History';
 
 export default function AppRouter() {
     return (
         <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
+            {/* Auth Routes */}
+            <Route element={<AuthLayout />}>
+                <Route path="/login" element={<Login />} />
+            </Route>
 
             {/* Admin Routes */}
             <Route path="/admin" element={<PrivateRoute />}>
-                <Route path="" element={<Navigate to="/admin/dashboard" replace />} />
-                <Route path="dashboard" element={
-                    <RoleRoute allowedRoles={['admin']}>
-                        <AdminDashboard />
-                    </RoleRoute>
-                } />
-                <Route path="plates" element={
-                    <RoleRoute allowedRoles={['admin']}>
-                        <PlateManagement />
-                    </RoleRoute>
-                } />
+                <Route element={<RoleRoute allowedRoles={['admin']}><AdminLayout /></RoleRoute>}>
+                    <Route path="" element={<Navigate to="/admin/dashboard" replace />} />
+                    <Route path="dashboard" element={<AdminDashboard />} />
+                    <Route path="plates" element={<PlateManagement />} />
+                </Route>
             </Route>
 
             {/* Kasir Routes */}
             <Route path="/kasir" element={<PrivateRoute />}>
-                <Route path="" element={<Navigate to="/kasir/pos" replace />} />
-                <Route path="pos" element={
-                    <RoleRoute allowedRoles={['kasir']}>
-                        <KasirPOS />
-                    </RoleRoute>
-                } />
-                <Route path="history" element={
-                    <RoleRoute allowedRoles={['kasir']}>
-                        <KasirHistory />
-                    </RoleRoute>
-                } />
+                <Route element={<RoleRoute allowedRoles={['kasir']}><KasirLayout /></RoleRoute>}>
+                    <Route path="" element={<Navigate to="/kasir/dashboard" replace />} />
+                    <Route path="dashboard" element={<KasirDashboard />} />
+                    <Route path="pos" element={<KasirPOS />} />
+                    <Route path="history" element={<KasirHistory />} />
+                </Route>
             </Route>
 
             {/* Default */}
