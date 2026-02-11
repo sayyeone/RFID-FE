@@ -25,7 +25,7 @@ export const useTransaction = () => {
                 quantity: item.quantity,
                 price: item.price
             }));
-            
+
             const transactionResponse = await transactionApi.create({ items });
             const transaction = transactionResponse.data.data;
 
@@ -35,7 +35,7 @@ export const useTransaction = () => {
 
             // Step 3: Open Midtrans Snap
             return new Promise((resolve, reject) => {
-                midtransService.openSnap(snapToken, {
+                midtransService.pay(snapToken, {
                     onSuccess: (result) => {
                         clearCart();
                         resolve({ transaction, paymentResult: result });

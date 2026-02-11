@@ -10,16 +10,22 @@ export default function PlateManagement() {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, active, inactive
-  
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const [perPage] = useState(10);
+
   // Modal states
   const [showForm, setShowForm] = useState(false);
   const [selectedPlate, setSelectedPlate] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
 
-  // Fetch plates
+  // Fetch plates when page changes
   useEffect(() => {
     fetchPlates();
-  }, []);
+  }, [currentPage]);
 
   // Filter plates when search or filter changes
   useEffect(() => {
@@ -46,8 +52,15 @@ export default function PlateManagement() {
   const fetchPlates = async () => {
     setLoading(true);
     try {
-      const response = await plateApi.getAll();
+      const response = await plateApi.getAll({ page: currentPage, per_page: perPage });
       setPlates(response.data.data || []);
+      setFilteredPlates(response.data.data || []);
+
+      // Update pagination metadata
+      if (response.data.meta) {
+        setTotalPages(response.data.meta.last_page);
+        setTotalItems(response.data.meta.total);
+      }
     } catch (err) {
       console.error('Failed to fetch plates:', err);
       alert('Failed to load plates');
@@ -146,8 +159,8 @@ export default function PlateManagement() {
 
         {/* Stats */}
         <div className="flex gap-4 mt-4 text-sm text-gray-600">
-          <span>Total: <strong>{plates.length}</strong></span>
-          <span>Showing: <strong>{filteredPlates.length}</strong></span>
+          <span>Total: <strong>{totalItems}</strong></span>
+          <span>Showing: <strong>{filteredPlates.length}</strong> of {totalItems}</span>
           <span>Active: <strong>{plates.filter(p => p.is_active).length}</strong></span>
         </div>
       </div>
@@ -160,6 +173,31 @@ export default function PlateManagement() {
           onDelete={handleDelete}
           loading={loading}
         />
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-between items-center mt-6 pt-6 border-t border-gray-200">
+            <p className="text-sm text-gray-600">
+              Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
+            </p>
+            <div className="flex gap-2">
+              <button
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => prev - 1)}
+                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              <button
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(prev => prev + 1)}
+                className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Form Modal */}

@@ -15,7 +15,7 @@ export default function RfidScanner() {
 
   const handleScan = async (e) => {
     e.preventDefault();
-    
+
     try {
       const plate = await scanRfid(rfidInput);
       if (plate) {
@@ -35,19 +35,22 @@ export default function RfidScanner() {
           <Scan className="text-primary" size={28} />
         </div>
         <div>
-          <h2 className="text-xl font-semibold text-gray-800">RFID Scanner</h2>
-          <p className="text-sm text-gray-500">Scan or enter RFID UID</p>
+          <h2 className="text-xl font-semibold text-gray-800">RFID Scanner (Manual)</h2>
+          <p className="text-sm text-gray-500">Type plate UID to add to cart</p>
         </div>
       </div>
 
       <form onSubmit={handleScan} className="space-y-4">
         <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Enter RFID UID Manually
+          </label>
           <input
             ref={inputRef}
             type="text"
             value={rfidInput}
             onChange={(e) => setRfidInput(e.target.value)}
-            placeholder="Enter RFID UID (e.g., ABC123)"
+            placeholder="Type UID here (e.g., A001, B002, C003)"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg font-mono"
             disabled={loading}
           />
@@ -76,7 +79,7 @@ export default function RfidScanner() {
       {lastScanned && !error && (
         <div className="mt-4 flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
           <CheckCircle className="text-green-600 flex-shrink-0 mt-0.5" size={20} />
-<div>
+          <div>
             <p className="text-sm font-medium text-green-800">
               Added: {lastScanned.name}
             </p>
@@ -89,12 +92,15 @@ export default function RfidScanner() {
 
       {/* Instructions */}
       <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <p className="text-xs font-semibold text-gray-700 mb-2">Quick Guide:</p>
+        <p className="text-xs font-semibold text-gray-700 mb-2">📝 How to Use (Manual Input):</p>
         <ul className="text-xs text-gray-600 space-y-1">
-          <li>• Place RFID plate on scanner</li>
-          <li>• Or manually type the UID and press Enter</li>
-          <li>• Item will automatically be added to cart</li>
+          <li>• Type the RFID UID manually (e.g., A001, B002)</li>
+          <li>• Press Enter or click "Scan Plate"</li>
+          <li>Item will be added to cart automatically</li>
         </ul>
+        <p className="text-xs text-gray-500 mt-2 italic">
+          Tip: Keep this input focused for quick entry
+        </p>
       </div>
     </div>
   );

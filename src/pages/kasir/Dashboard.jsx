@@ -55,7 +55,7 @@ export default function KasirDashboard() {
                 <LayoutDashboard size={32} className="text-primary" />
                 <div>
                     <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-                    <p className="text-gray-500 text-sm">Welcome back, {user?.name || 'Kasir'}! 👋</p>
+                    <p className="text-gray-500 text-sm">Welcome back, {user?.name || 'Kasir'}!</p>
                 </div>
             </div>
 
@@ -148,8 +148,8 @@ export default function KasirDashboard() {
                                         Rp {transaction.total_amount.toLocaleString('id-ID')}
                                     </p>
                                     <span className={`text-xs px-2 py-0.5 rounded-full ${transaction.status === 'paid'
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-yellow-100 text-yellow-800'
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-yellow-100 text-yellow-800'
                                         }`}>
                                         {transaction.status.toUpperCase()}
                                     </span>

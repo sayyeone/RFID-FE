@@ -3,7 +3,7 @@ import api from './axiosConfig';
 export const paymentApi = {
   // Create payment / Get snap token
   createSnapToken: (transactionId) => {
-    return api.post('/payment/snap', { transaction_id: transactionId });
+    return api.post(`/payment/snap/${transactionId}`);
   },
 
   // Check payment status

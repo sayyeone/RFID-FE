@@ -43,7 +43,7 @@ export default function PlateForm({ plate, onSubmit, onClose, loading }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (validate()) {
       onSubmit({
         ...formData,
@@ -58,7 +58,7 @@ export default function PlateForm({ plate, onSubmit, onClose, loading }) {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     // Clear error when user types
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -66,8 +66,8 @@ export default function PlateForm({ plate, onSubmit, onClose, loading }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full">
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full pointer-events-auto" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-800">
@@ -83,22 +83,24 @@ export default function PlateForm({ plate, onSubmit, onClose, loading }) {
           {/* RFID UID */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              RFID UID *
+              RFID UID (Manual Input) *
             </label>
             <input
               type="text"
               name="rfid_uid"
               value={formData.rfid_uid}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono ${
-                errors.rfid_uid ? 'border-red-500' : 'border-gray-300'
-              }`}
-              placeholder="ABC123"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent font-mono ${errors.rfid_uid ? 'border-red-500' : 'border-gray-300'
+                }`}
+              placeholder="e.g., A001, B002, C003"
               disabled={!!plate} // Disable editing UID for existing plates
             />
             {errors.rfid_uid && (
               <p className="text-red-500 text-xs mt-1">{errors.rfid_uid}</p>
             )}
+            <p className="text-xs text-gray-500 mt-1">
+              Enter unique plate identifier (will be typed by Kasir during scan)
+            </p>
           </div>
 
           {/* Plate Name */}
@@ -111,9 +113,8 @@ export default function PlateForm({ plate, onSubmit, onClose, loading }) {
               name="name"
               value={formData.name}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                errors.name ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${errors.name ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="Nasi Goreng Spesial"
             />
             {errors.name && (
@@ -131,9 +132,8 @@ export default function PlateForm({ plate, onSubmit, onClose, loading }) {
               name="price"
               value={formData.price}
               onChange={handleChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                errors.price ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${errors.price ? 'border-red-500' : 'border-gray-300'
+                }`}
               placeholder="15000"
               min="0"
               step="500"
