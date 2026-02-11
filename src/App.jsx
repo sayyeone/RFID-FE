@@ -1,10 +1,13 @@
-import { AuthProvider } from './contexts/AuthContext'
+import { AuthProvider } from './context/AuthContext'
+import { CartProvider } from './context/CartContext'
 import AppRouter from './router/AppRouter'
 
 function App() {
   return (
     <AuthProvider>
-      <AppRouter />
+      <CartProvider>
+        <AppRouter />
+      </CartProvider>
     </AuthProvider>
   )
 }
