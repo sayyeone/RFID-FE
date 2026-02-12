@@ -66,8 +66,8 @@ export default function PlateForm({ plate, onSubmit, onClose, loading }) {
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4 pointer-events-none">
-      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full pointer-events-auto" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-xl shadow-2xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-2xl font-bold text-gray-800">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, LogOut, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, Users, LogOut, Menu, X, Layers } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 export default function AdminLayout() {
@@ -18,7 +18,8 @@ export default function AdminLayout() {
 
     const menuItems = [
         { path: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-        { path: '/admin/plates', icon: Package, label: 'Plate Management' },
+        { path: '/admin/plates', icon: Layers, label: 'Plate Management' },
+        { path: '/admin/items', icon: Package, label: 'Item Management' },
         { path: '/admin/users', icon: Users, label: 'User Management' }
     ];
 
@@ -50,8 +51,8 @@ export default function AdminLayout() {
                                 key={item.path}
                                 to={item.path}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(item.path)
-                                        ? 'bg-purple-100 text-primary font-semibold'
-                                        : 'text-gray-700 hover:bg-gray-100'
+                                    ? 'bg-purple-100 text-primary font-semibold'
+                                    : 'text-gray-700 hover:bg-gray-100'
                                     }`}
                             >
                                 <item.icon size={20} />

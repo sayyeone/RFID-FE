@@ -11,6 +11,8 @@ import KasirLayout from '../layouts/KasirLayout';
 // Admin Pages
 import AdminDashboard from '../pages/admin/Dashboard';
 import PlateManagement from '../pages/admin/PlateManagement';
+import ItemManagement from '../pages/admin/ItemManagement';
+import UserManagement from '../pages/admin/UserManagement';
 
 // Kasir Pages
 import KasirDashboard from '../pages/kasir/Dashboard';
@@ -31,6 +33,8 @@ export default function AppRouter() {
                     <Route path="" element={<Navigate to="/admin/dashboard" replace />} />
                     <Route path="dashboard" element={<AdminDashboard />} />
                     <Route path="plates" element={<PlateManagement />} />
+                    <Route path="items" element={<ItemManagement />} />
+                    <Route path="users" element={<UserManagement />} />
                 </Route>
             </Route>
 
