@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Users, Plus, Search, Mail, Shield, Edit2, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../api/axiosConfig';
+import AlertModal from '../../components/common/AlertModal';
 
 export default function UserManagement() {
     const [users, setUsers] = useState([]);
@@ -12,20 +13,58 @@ export default function UserManagement() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
-    const [perPage] = useState(10);
+    const [perPage, setPerPage] = useState(10);
 
     // Modal states
     const [showForm, setShowForm] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [alertConfig, setAlertConfig] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info',
+        onConfirm: null
+    });
+
+    const showAlert = (title, message, type = 'info', onConfirm = null) => {
+        setAlertConfig({
+            isOpen: true,
+            title,
+            message,
+            type,
+            onConfirm
+        });
+    };
 
     useEffect(() => {
         fetchUsers();
-    }, [currentPage]);
+    }, [currentPage, searchQuery, filterRole, perPage]);
+
+    useEffect(() => {
+        if (currentPage !== 1) {
+            setCurrentPage(1);
+        } else {
+            fetchUsers();
+        }
+    }, [searchQuery, filterRole, perPage]);
 
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/users', { params: { page: currentPage, per_page: perPage } });
+            const params = {
+                page: currentPage,
+                per_page: perPage
+            };
+
+            if (searchQuery) {
+                params.search = searchQuery;
+            }
+
+            if (filterRole !== 'all') {
+                params.role = filterRole;
+            }
+
+            const response = await api.get('/users', { params });
             setUsers(response.data.data || []);
             if (response.data.meta) {
                 setTotalPages(response.data.meta.last_page);
@@ -33,7 +72,7 @@ export default function UserManagement() {
             }
         } catch (err) {
             console.error('Failed to fetch users:', err);
-            alert('Failed to load users');
+            showAlert('Error', 'Gagal memuat data user.', 'error');
         } finally {
             setLoading(false);
         }
@@ -50,39 +89,40 @@ export default function UserManagement() {
     };
 
     const handleDelete = async (user) => {
-        if (window.confirm(`Hapus user "${user.name}"?`)) {
-            try {
-                await api.delete(`/users/${user.id}`);
-                alert('User berhasil dihapus');
-                fetchUsers();
-            } catch (err) {
-                alert('Gagal menghapus user: ' + (err.response?.data?.message || 'Unknown error'));
+        showAlert(
+            'Konfirmasi Hapus',
+            `Apakah Anda yakin ingin menghapus user "${user.name}"?`,
+            'confirm',
+            async () => {
+                try {
+                    await api.delete(`/users/${user.id}`);
+                    showAlert('Berhasil', 'User telah berhasil dihapus.', 'success');
+                    fetchUsers();
+                } catch (err) {
+                    showAlert('Gagal', 'Terjadi kesalahan saat menghapus user: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error');
+                }
             }
-        }
+        );
     };
 
     const handleSubmit = async (formData) => {
         try {
             if (selectedUser) {
                 await api.put(`/users/${selectedUser.id}`, formData);
-                alert('User berhasil diupdate');
+                showAlert('Berhasil', 'Data user berhasil diperbarui.', 'success');
             } else {
                 await api.post('/users', formData);
-                alert('User berhasil ditambahkan');
+                showAlert('Berhasil', 'User baru telah ditambahkan.', 'success');
             }
             setShowForm(false);
             fetchUsers();
         } catch (err) {
-            alert('Gagal menyimpan user: ' + (err.response?.data?.message || 'Unknown error'));
+            showAlert('Gagal Menyimpan', 'Terjadi kesalahan: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error');
         }
     };
 
-    const filteredUsers = users.filter(user => {
-        const matchSearch = user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchRole = filterRole === 'all' || user.role === filterRole;
-        return matchSearch && matchRole;
-    });
+    // Users are already filtered by backend
+    const filteredUsers = users;
 
     return (
         <div>
@@ -129,6 +169,19 @@ export default function UserManagement() {
                 <div className="flex gap-4 mt-4 text-sm text-gray-600">
                     <span>Total: <strong>{totalItems}</strong></span>
                     <span>Showing: <strong>{filteredUsers.length}</strong> of {totalItems}</span>
+                    <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-400">Show:</span>
+                        <select
+                            value={perPage}
+                            onChange={(e) => setPerPage(Number(e.target.value))}
+                            className="text-xs border border-gray-200 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-purple-500"
+                        >
+                            <option value={10}>10</option>
+                            <option value={25}>25</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -238,10 +291,19 @@ export default function UserManagement() {
             {showForm && (
                 <UserForm
                     user={selectedUser}
-                    onSubmit={handleSubmit}
                     onClose={() => setShowForm(false)}
+                    onSubmit={handleSubmit}
                 />
             )}
+
+            <AlertModal
+                isOpen={alertConfig.isOpen}
+                onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+                title={alertConfig.title}
+                message={alertConfig.message}
+                type={alertConfig.type}
+                onConfirm={alertConfig.onConfirm}
+            />
         </div>
     );
 }

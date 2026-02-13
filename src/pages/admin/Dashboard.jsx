@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { LayoutDashboard, DollarSign, ShoppingCart, Package, Users } from 'lucide-react';
 import { dashboardApi } from '../../api/dashboardApi';
+import { useAuth } from '../../hooks/useAuth';
 import StatsCard from '../../components/admin/StatsCard';
 import RevenueChart from '../../components/admin/RevenueChart';
 import PopularPlatesChart from '../../components/admin/PopularPlatesChart';
 import RecentTransactions from '../../components/admin/RecentTransactions';
 
 export default function AdminDashboard() {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     revenue: 0,
     transactions: 0,
@@ -46,16 +48,17 @@ export default function AdminDashboard() {
 
   return (
     <div>
-      <div className="flex items-center gap-3 mb-6">
-        <LayoutDashboard size={32} className="text-primary" />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+        <LayoutDashboard size={28} className="text-primary hidden sm:block" />
+        <LayoutDashboard size={24} className="text-primary sm:hidden" />
         <div>
-          <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-          <p className="text-gray-500 text-sm">Welcome back! Here's your overview</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Dashboard</h1>
+          <p className="text-gray-500 text-xs sm:text-sm">Selamat datang, <span className="font-semibold text-primary">{user?.name || 'Admin'}</span>! 👋</p>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
         <StatsCard
           title="Total Revenue"
           value={`Rp ${stats.revenue.toLocaleString('id-ID')}`}
@@ -85,7 +88,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
         <RevenueChart data={revenueData} loading={loading} />
         <PopularPlatesChart data={popularPlates} loading={loading} />
       </div>

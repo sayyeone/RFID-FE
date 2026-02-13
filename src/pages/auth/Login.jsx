@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../api/axiosConfig';
-import { LogIn, Lock, Mail } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
@@ -20,172 +22,182 @@ export default function Login() {
       const { token, user } = response.data;
       login(user, token);
     } catch (err) {
-      setError(err.response?.data?.message || 'Login failed');
+      setError(err.response?.data?.message || 'Email atau password salah. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left Side - Branding & Features */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-purple-600 via-purple-700 to-blue-600 relative overflow-hidden">
-        {/* Decorative circles */}
-        <div className="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-400/20 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
+    <div className="fixed inset-0 w-full h-full flex overflow-hidden z-50 bg-white font-['Open_Sans']">
 
-        <div className="relative z-10 flex flex-col justify-center px-16 py-12 text-white">
-          {/* Logo */}
-          <div className="mb-12">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl mb-6 shadow-xl">
-              <LogIn size={40} className="text-white" />
-            </div>
-            <h1 className="text-5xl font-bold mb-4 leading-tight">
-              POS RFID<br />System
-            </h1>
-            <p className="text-xl text-purple-100">
-              Modern restaurant management with RFID technology
-            </p>
+      {/* LEFT SIDE - 60% Illustration Panel (NO BOXES) */}
+      <div className="hidden lg:flex lg:w-[60%] bg-gradient-to-br from-[#f0f2ff] via-[#e6e9ff] to-[#f5f7ff] relative overflow-hidden items-center justify-center">
+
+        {/* Simple Background Decorations - Circles Only */}
+        <div className="absolute top-20 left-20 w-16 h-16 bg-blue-400 rounded-full opacity-10 animate-pulse"></div>
+        <div className="absolute top-40 right-40 w-12 h-12 bg-purple-400 rounded-full opacity-10"></div>
+        <div className="absolute bottom-40 left-32 w-20 h-20 bg-indigo-300 opacity-10 rounded-full"></div>
+        <div className="absolute bottom-60 right-24 w-10 h-10 bg-pink-300 rounded-full opacity-10"></div>
+
+        {/* Brand Logo - Top Left (No Overlap) */}
+        <div className="absolute top-8 left-8 flex items-center gap-3 z-50">
+          <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center backdrop-blur-sm">
+            {/* Food/Restaurant Icon */}
+            <svg className="w-7 h-7 text-primary" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M11 9H9V2H7V9H5V2H3V9C3 11.12 4.66 12.84 6.75 12.97V22H9.25V12.97C11.34 12.84 13 11.12 13 9V2H11V9ZM16 6V14H18.5V22H21V2C18.24 2 16 4.24 16 6Z" />
+            </svg>
           </div>
+          <span className="text-2xl font-bold text-[#566a7f]">POS RFID</span>
+        </div>
 
-          {/* Features */}
-          <div className="space-y-6">
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                  <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Real-time Plate Scanning</h3>
-                <p className="text-purple-200">Instant menu item detection with RFID plates</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
-                  <path fillRule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Secure Payments</h3>
-                <p className="text-purple-200">Integrated with Midtrans payment gateway</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                </svg>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-1">Analytics Dashboard</h3>
-                <p className="text-purple-200">Track sales, inventory, and performance</p>
-              </div>
-            </div>
-          </div>
+        {/* Main Illustration - Centered */}
+        <div className="relative z-10 w-full h-full flex items-center justify-center p-12">
+          <img
+            src="https://demos.themeselection.com/sneat-bootstrap-html-laravel-admin-template/demo/assets/img/illustrations/boy-with-rocket-light.png"
+            alt="Illustration"
+            className="max-w-[80%] max-h-[80%] object-contain drop-shadow-xl"
+          />
         </div>
       </div>
 
-      {/* Right Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-gray-50">
-        <div className="w-full max-w-md">
+      {/* RIGHT SIDE - 40% Login Form Panel (NO BOXES, FULL BG) */}
+      <div className="flex-1 lg:w-[40%] flex items-center justify-center bg-white relative">
+        <div className="w-full max-w-md px-8 py-10">
+
           {/* Mobile Logo */}
-          <div className="lg:hidden text-center mb-10">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-600 rounded-2xl mb-4">
-              <LogIn className="text-white" size={32} />
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
+            <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+              <svg className="w-7 h-7 text-primary" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M11 9H9V2H7V9H5V2H3V9C3 11.12 4.66 12.84 6.75 12.97V22H9.25V12.97C11.34 12.84 13 11.12 13 9V2H11V9ZM16 6V14H18.5V22H21V2C18.24 2 16 4.24 16 6Z" />
+              </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-800">POS RFID System</h1>
+            <span className="text-2xl font-bold text-[#566a7f]">POS RFID</span>
           </div>
 
-          {/* Login Card */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h2>
-              <p className="text-gray-600">Sign in to access your dashboard</p>
+          {/* Welcome Header */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-[#566a7f] mb-2">Welcome to POS RFID! 👋</h2>
+            <p className="text-[#a1acb8]">Please sign-in to your account and start the adventure</p>
+          </div>
+
+          {/* Error Alert */}
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6 text-sm flex items-start gap-2">
+              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <p>{error}</p>
+            </div>
+          )}
+
+          {/* Login Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+
+            {/* Email Field */}
+            <div>
+              <label htmlFor="email" className="block text-sm font-semibold text-[#566a7f] mb-1.5 uppercase tracking-wide">
+                Email or Username
+              </label>
+              <input
+                type="text"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 border border-[#d9dee3] rounded-lg focus:border-primary focus:ring-4 focus:ring-primary/10 outline-none transition-all text-[#697a8d] placeholder-gray-400"
+                placeholder="Enter your email or username"
+                required
+                autoFocus
+              />
             </div>
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 flex items-start gap-3">
-                <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <span>{error}</span>
+            {/* Password Field */}
+            <div>
+              <div className="flex justify-between mb-1.5">
+                <label htmlFor="password" className="block text-sm font-semibold text-[#566a7f] uppercase tracking-wide">
+                  Password
+                </label>
+                <a href="#" className="text-sm text-primary hover:text-[#5f61e6] font-medium transition-colors">
+                  Forgot Password?
+                </a>
               </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                    placeholder="your.email@example.com"
-                    required
-                    autoComplete="email"
-                  />
-                </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-4 outline-none transition-all text-[#697a8d] pr-12 placeholder-gray-400 ${password.length > 0 && password.length <= 6
+                    ? 'border-red-500 focus:border-red-500 focus:ring-red-500/10'
+                    : 'border-[#d9dee3] focus:border-primary focus:ring-primary/10'
+                    }`}
+                  placeholder="············"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a1acb8] hover:text-[#697a8d] transition-colors p-1"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
               </div>
+              {password.length > 0 && password.length <= 6 && (
+                <p className="text-red-500 text-xs mt-1.5">
+                  Password must be more than 6 characters
+                </p>
+              )}
+            </div>
 
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-                    placeholder="Enter your password"
-                    required
-                    autoComplete="current-password"
-                  />
+            {/* Remember Me */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="remember-me"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-[#d9dee3] text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
+              />
+              <label htmlFor="remember-me" className="ml-2.5 text-sm text-[#697a8d] select-none cursor-pointer hover:text-[#566a7f]">
+                Remember Me
+              </label>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary hover:bg-[#5f61e6] text-white font-bold py-3.5 rounded-lg shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none mt-2"
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                  </svg>
+                  <span>SIGNING IN...</span>
+                </>
+              ) : 'SIGN IN'}
+            </button>
+          </form>
+
+          {/* Demo Credentials */}
+          <div className="mt-8 pt-6 border-t border-gray-100">
+            <div className="bg-gradient-to-r from-[#f0f2ff] to-[#fef5f7] rounded-lg p-4 border border-primary/10">
+              <p className="text-xs font-bold text-[#697a8d] uppercase mb-3 text-center tracking-wider">Demo Access</p>
+              <div className="space-y-2">
+                <div className="flex justify-between items-center text-sm py-1.5 px-2 bg-white/60 rounded-lg">
+                  <span className="font-semibold text-gray-600">Admin</span>
+                  <span className="font-mono text-[#697a8d] text-xs">admin@pos.com / admin123</span>
                 </div>
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3.5 rounded-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg shadow-purple-600/30"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    Signing in...
-                  </span>
-                ) : 'Sign In'}
-              </button>
-            </form>
-
-            {/* Demo Credentials */}
-            <div className="mt-8 pt-6 border-t border-gray-200">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Demo Accounts:</p>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center justify-between px-4 py-2.5 bg-purple-50 rounded-lg border border-purple-100">
-                  <span className="font-medium text-purple-900">Admin</span>
-                  <span className="text-purple-700 font-mono text-xs">admin@pos.com / admin123</span>
-                </div>
-                <div className="flex items-center justify-between px-4 py-2.5 bg-blue-50 rounded-lg border border-blue-100">
-                  <span className="font-medium text-blue-900">Kasir</span>
-                  <span className="text-blue-700 font-mono text-xs">kasir@pos.com / kasir123</span>
+                <div className="flex justify-between items-center text-sm py-1.5 px-2 bg-white/60 rounded-lg">
+                  <span className="font-semibold text-gray-600">Kasir</span>
+                  <span className="font-mono text-[#697a8d] text-xs">kasir@pos.com / kasir123</span>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>

@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Package, Plus, Search } from 'lucide-react';
-import { plateApi } from '../../api/plateApi';
+import api from '../../api/axiosConfig';
+import AlertModal from '../../components/common/AlertModal';
 import PlateTable from '../../components/admin/PlateTable';
 import PlateForm from '../../components/admin/PlateForm';
 
 export default function PlateManagement() {
   const [plates, setPlates] = useState([]);
-  const [filteredPlates, setFilteredPlates] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // all, active, inactive
@@ -15,46 +15,57 @@ export default function PlateManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  const [perPage] = useState(10);
+  const [perPage, setPerPage] = useState(10);
 
   // Modal states
   const [showForm, setShowForm] = useState(false);
   const [selectedPlate, setSelectedPlate] = useState(null);
+  const [alertConfig, setAlertConfig] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info',
+    onConfirm: null
+  });
+
+  const showAlert = (title, message, type = 'info', onConfirm = null) => {
+    setAlertConfig({
+      isOpen: true,
+      title,
+      message,
+      type,
+      onConfirm
+    });
+  };
   const [formLoading, setFormLoading] = useState(false);
 
-  // Fetch plates when page changes
+  // Fetch plates when page or search changes
   useEffect(() => {
     fetchPlates();
-  }, [currentPage]);
+  }, [currentPage, searchQuery, perPage]);
 
-  // Filter plates when search or filter changes
   useEffect(() => {
-    let result = plates;
-
-    // Search filter
-    if (searchQuery) {
-      result = result.filter(plate =>
-        plate.rfid_uid.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        plate.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      fetchPlates(); // Fetch if already on page 1
     }
-
-    // Status filter
-    if (filterStatus !== 'all') {
-      result = result.filter(plate =>
-        filterStatus === 'active' ? plate.is_active : !plate.is_active
-      );
-    }
-
-    setFilteredPlates(result);
-  }, [plates, searchQuery, filterStatus]);
+  }, [searchQuery, perPage]);
 
   const fetchPlates = async () => {
     setLoading(true);
     try {
-      const response = await plateApi.getAll({ page: currentPage, per_page: perPage });
+      const params = {
+        page: currentPage,
+        per_page: perPage
+      };
+
+      if (searchQuery) {
+        params.search = searchQuery;
+      }
+
+      const response = await api.get('/plates', { params }); // Changed API call
       setPlates(response.data.data || []);
-      setFilteredPlates(response.data.data || []);
 
       // Update pagination metadata
       if (response.data.meta) {
@@ -63,7 +74,7 @@ export default function PlateManagement() {
       }
     } catch (err) {
       console.error('Failed to fetch plates:', err);
-      alert('Failed to load plates');
+      showAlert('Error', 'Gagal memuat data plate.', 'error');
     } finally {
       setLoading(false);
     }
@@ -79,17 +90,38 @@ export default function PlateManagement() {
     setShowForm(true);
   };
 
-  const handleDelete = async (plate) => {
-    if (window.confirm(`Are you sure you want to delete "${plate.name}"?`)) {
-      try {
-        await plateApi.delete(plate.id);
-        alert('Plate deleted successfully');
-        fetchPlates();
-      } catch (err) {
-        console.error('Failed to delete plate:', err);
-        alert('Failed to delete plate: ' + (err.response?.data?.message || 'Unknown error'));
+  const handleActivateAll = async () => {
+    showAlert(
+      'Aktivasi Masal',
+      'Apakah Anda yakin ingin mengaktifkan SEMUA plate yang tidak aktif?',
+      'confirm',
+      async () => {
+        try {
+          await api.post('/plates/activate-all');
+          showAlert('Berhasil', 'Semua plate telah berhasil diaktifkan.', 'success');
+          fetchPlates();
+        } catch (err) {
+          showAlert('Gagal', 'Gagal mengaktifkan plate: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error');
+        }
       }
-    }
+    );
+  };
+
+  const handleDelete = async (plate) => {
+    showAlert(
+      'Konfirmasi Hapus',
+      `Apakah Anda yakin ingin menghapus plate "${plate.name}" ? `,
+      'confirm',
+      async () => {
+        try {
+          await api.delete(`/ plates / ${plate.id} `); // Changed API call
+          showAlert('Berhasil', 'Plate telah berhasil dihapus.', 'success'); // Changed alert
+          fetchPlates();
+        } catch (err) {
+          showAlert('Gagal', 'Gagal menghapus plate: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error'); // Changed alert
+        }
+      }
+    );
   };
 
   const handleSubmit = async (formData) => {
@@ -97,22 +129,30 @@ export default function PlateManagement() {
     try {
       if (selectedPlate) {
         // Update
-        await plateApi.update(selectedPlate.id, formData);
-        alert('Plate updated successfully');
+        await api.put(`/ plates / ${selectedPlate.id} `, formData); // Changed API call
+        showAlert('Berhasil', 'Data plate berhasil diperbarui.', 'success'); // Changed alert
       } else {
         // Create
-        await plateApi.create(formData);
-        alert('Plate created successfully');
+        await api.post('/plates', formData); // Changed API call
+        showAlert('Berhasil', 'Plate baru telah ditambahkan.', 'success'); // Changed alert
       }
       setShowForm(false);
       fetchPlates();
     } catch (err) {
       console.error('Failed to save plate:', err);
-      alert('Failed to save plate: ' + (err.response?.data?.message || 'Unknown error'));
+      showAlert('Gagal Menyimpan', 'Terjadi kesalahan: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error'); // Changed alert
     } finally {
       setFormLoading(false);
     }
   };
+
+  // Apply client-side status filter
+  const filteredPlates = plates.filter(plate => {
+    if (filterStatus === 'all') return true;
+    if (filterStatus === 'active') return plate.is_active;
+    if (filterStatus === 'inactive') return !plate.is_active;
+    return true;
+  });
 
   return (
     <div>
@@ -161,7 +201,19 @@ export default function PlateManagement() {
         <div className="flex gap-4 mt-4 text-sm text-gray-600">
           <span>Total: <strong>{totalItems}</strong></span>
           <span>Showing: <strong>{filteredPlates.length}</strong> of {totalItems}</span>
-          <span>Active: <strong>{plates.filter(p => p.is_active).length}</strong></span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400">Show:</span>
+            <select
+              value={perPage}
+              onChange={(e) => setPerPage(Number(e.target.value))}
+              className="text-xs border border-gray-200 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-purple-500"
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+          </div>
         </div>
       </div>
 
@@ -209,6 +261,15 @@ export default function PlateManagement() {
           loading={formLoading}
         />
       )}
+
+      <AlertModal
+        isOpen={alertConfig.isOpen}
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        title={alertConfig.title}
+        message={alertConfig.message}
+        type={alertConfig.type}
+        onConfirm={alertConfig.onConfirm}
+      />
     </div>
   );
 }

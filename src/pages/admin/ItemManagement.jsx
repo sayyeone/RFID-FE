@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Package, Plus, Search, UtensilsCrossed, Coffee, IceCream, Cookie, ShoppingBag, PlusCircle, Edit2, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../api/axiosConfig';
+import AlertModal from '../../components/common/AlertModal';
 
 export default function ItemManagement() {
     const [items, setItems] = useState([]);
@@ -12,11 +13,28 @@ export default function ItemManagement() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
-    const [perPage] = useState(10);
+    const [perPage, setPerPage] = useState(10);
 
     // Modal states
     const [showForm, setShowForm] = useState(false);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [alertConfig, setAlertConfig] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        type: 'info',
+        onConfirm: null
+    });
+
+    const showAlert = (title, message, type = 'info', onConfirm = null) => {
+        setAlertConfig({
+            isOpen: true,
+            title,
+            message,
+            type,
+            onConfirm
+        });
+    };
 
     // Kategori enum from backend with icons and colors
     const KATEGORI_CONFIG = {
@@ -31,12 +49,25 @@ export default function ItemManagement() {
 
     useEffect(() => {
         fetchItems();
-    }, [currentPage]);
+    }, [currentPage, searchQuery, filterKategori, perPage]);
 
     const fetchItems = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/items', { params: { page: currentPage, per_page: perPage } });
+            const params = {
+                page: currentPage,
+                per_page: perPage
+            };
+
+            if (searchQuery) {
+                params.search = searchQuery;
+            }
+
+            if (filterKategori !== 'all') {
+                params.kategori = filterKategori;
+            }
+
+            const response = await api.get('/items', { params });
             setItems(response.data.data || []);
             if (response.data.meta) {
                 setTotalPages(response.data.meta.last_page);
@@ -44,11 +75,19 @@ export default function ItemManagement() {
             }
         } catch (err) {
             console.error('Failed to fetch items:', err);
-            alert('Failed to load items');
+            showAlert('Error', 'Gagal memuat data menu items.', 'error');
         } finally {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        if (currentPage !== 1) {
+            setCurrentPage(1);
+        } else {
+            fetchItems(); // Explicitly fetch if already on page 1
+        }
+    }, [searchQuery, filterKategori, perPage]);
 
     const handleCreate = () => {
         setSelectedItem(null);
@@ -61,38 +100,40 @@ export default function ItemManagement() {
     };
 
     const handleDelete = async (item) => {
-        if (window.confirm(`Hapus item "${item.nama_item}"?`)) {
-            try {
-                await api.delete(`/items/${item.id}`);
-                alert('Item berhasil dihapus');
-                fetchItems();
-            } catch (err) {
-                alert('Gagal menghapus item: ' + (err.response?.data?.message || 'Unknown error'));
+        showAlert(
+            'Konfirmasi Hapus',
+            `Apakah Anda yakin ingin menghapus item "${item.nama_item}"? Tindakan ini tidak dapat dibatalkan.`,
+            'confirm',
+            async () => {
+                try {
+                    await api.delete(`/items/${item.id}`);
+                    showAlert('Berhasil', 'Item telah berhasil dihapus.', 'success');
+                    fetchItems();
+                } catch (err) {
+                    showAlert('Gagal', 'Terjadi kesalahan saat menghapus item: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error');
+                }
             }
-        }
+        );
     };
 
     const handleSubmit = async (formData) => {
         try {
             if (selectedItem) {
                 await api.put(`/items/${selectedItem.id}`, formData);
-                alert('Item berhasil diupdate');
+                showAlert('Berhasil', 'Data item berhasil diperbarui.', 'success');
             } else {
                 await api.post('/items', formData);
-                alert('Item berhasil ditambahkan');
+                showAlert('Berhasil', 'Item baru telah ditambahkan.', 'success');
             }
             setShowForm(false);
             fetchItems();
         } catch (err) {
-            alert('Gagal menyimpan item: ' + (err.response?.data?.message || 'Unknown error'));
+            showAlert('Gagal Menyimpan', 'Terjadi kesalahan: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error');
         }
     };
 
-    const filteredItems = items.filter(item => {
-        const matchSearch = item.nama_item.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchKategori = filterKategori === 'all' || item.kategori === filterKategori;
-        return matchSearch && matchKategori;
-    });
+    // Items are already filtered by backend
+    const displayedItems = items;
 
     return (
         <div>
@@ -140,6 +181,20 @@ export default function ItemManagement() {
                 <div className="flex gap-4 mt-4 text-sm text-gray-600">
                     <span>Total: <strong>{totalItems}</strong></span>
                     <span>Showing: <strong>{filteredItems.length}</strong> of {totalItems}</span>
+                    {/* Pagination Settings */}
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-gray-500">Show</span>
+                        <select
+                            value={perPage}
+                            onChange={(e) => setPerPage(Number(e.target.value))}
+                            className="px-2 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 outline-none"
+                        >
+                            <option value={10}>10</option>
+                            <option value={25}>25</option>
+                            <option value={50}>50</option>
+                            <option value={100}>100</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -151,69 +206,72 @@ export default function ItemManagement() {
                         <p className="text-gray-500">Loading items...</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b border-gray-200">
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Item Name</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Category</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Price</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                                    <th className="text-center py-3 px-4 font-semibold text-gray-700">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredItems.map(item => (
-                                    <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                        <td className="py-3 px-4">{item.nama_item}</td>
-                                        <td className="py-3 px-4">
-                                            {KATEGORI_CONFIG[item.kategori] && (() => {
-                                                const config = KATEGORI_CONFIG[item.kategori];
-                                                const IconComponent = config.icon;
-                                                return (
-                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${config.color}`}>
-                                                        <IconComponent size={16} />
-                                                        <span className="capitalize">{item.kategori}</span>
-                                                    </span>
-                                                );
-                                            })()}
-                                        </td>
-                                        <td className="py-3 px-4">Rp {item.harga.toLocaleString('id-ID')}</td>
-                                        <td className="py-3 px-4">
-                                            {item.status === '1' ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                    <CheckCircle size={14} />
-                                                    Active
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                    <XCircle size={14} />
-                                                    Inactive
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="py-3 px-4">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <button
-                                                    onClick={() => handleEdit(item)}
-                                                    className="text-blue-600 hover:text-blue-900 p-1.5 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title="Edit Item"
-                                                >
-                                                    <Edit2 size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(item)}
-                                                    className="text-red-600 hover:text-red-900 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                                                    title="Delete Item"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
+                    <div className="overflow-x-auto -mx-4 sm:mx-0">
+                        <div className="inline-block min-w-full align-middle">
+                            <table className="w-full min-w-[640px]">
+                                <thead>
+                                    <tr className="border-b border-gray-200">
+                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Item Name</th>
+                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Category</th>
+                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Price</th>
+                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                        <th className="text-center py-3 px-4 font-semibold text-gray-700">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {displayedItems.map(item => (
+                                        <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                            <td className="py-3 px-4">{item.nama_item}</td>
+                                            <td className="py-3 px-4">
+                                                {KATEGORI_CONFIG[item.kategori] && (() => {
+                                                    const config = KATEGORI_CONFIG[item.kategori];
+                                                    const IconComponent = config.icon;
+                                                    return (
+                                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${config.color}`}>
+                                                            <IconComponent size={16} />
+                                                            <span className="capitalize">{item.kategori}</span>
+                                                        </span>
+                                                    );
+                                                })()}
+                                            </td>
+                                            <td className="py-3 px-4">Rp {item.harga.toLocaleString('id-ID')}</td>
+                                            <td className="py-3 px-4">
+                                                {item.status === '1' ? (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <CheckCircle size={14} />
+                                                        Active
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        <XCircle size={14} />
+                                                        Inactive
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="py-3 px-4">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button
+                                                        onClick={() => handleEdit(item)}
+                                                        className="text-blue-600 hover:text-blue-900 p-1.5 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title="Edit Item"
+                                                    >
+                                                        <Edit2 size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(item)}
+                                                        className="text-red-600 hover:text-red-900 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                                                        title="Delete Item"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 
@@ -252,6 +310,15 @@ export default function ItemManagement() {
                     kategoriOptions={KATEGORI_OPTIONS}
                 />
             )}
+
+            <AlertModal
+                isOpen={alertConfig.isOpen}
+                onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+                title={alertConfig.title}
+                message={alertConfig.message}
+                type={alertConfig.type}
+                onConfirm={alertConfig.onConfirm}
+            />
         </div>
     );
 }
