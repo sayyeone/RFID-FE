@@ -5,17 +5,11 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function AdminLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [sidebarWidth, setSidebarWidth] = useState(264); // Default 264px (w-64 + padding)
-    const [isResizing, setIsResizing] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
     const dropdownRef = useRef(null);
-    const sidebarRef = useRef(null);
-
-    const MIN_SIDEBAR_WIDTH = 200;
-    const MAX_SIDEBAR_WIDTH = 400;
 
     // Auto-open sidebar on desktop
     useEffect(() => {
@@ -44,32 +38,6 @@ export default function AdminLayout() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Handle sidebar resize
-    useEffect(() => {
-        const handleMouseMove = (e) => {
-            if (!isResizing) return;
-
-            const newWidth = e.clientX;
-            if (newWidth >= MIN_SIDEBAR_WIDTH && newWidth <= MAX_SIDEBAR_WIDTH) {
-                setSidebarWidth(newWidth);
-            }
-        };
-
-        const handleMouseUp = () => {
-            setIsResizing(false);
-        };
-
-        if (isResizing) {
-            document.addEventListener('mousemove', handleMouseMove);
-            document.addEventListener('mouseup', handleMouseUp);
-        }
-
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        };
-    }, [isResizing]);
-
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to logout?')) {
             logout();
@@ -90,7 +58,6 @@ export default function AdminLayout() {
         <div className="h-screen flex overflow-hidden bg-gray-50">
             {/* Fixed Sidebar */}
             <aside
-                ref={sidebarRef}
                 className={`
                     fixed left-0 top-0 h-screen
                     bg-white border-r border-gray-100
@@ -98,7 +65,7 @@ export default function AdminLayout() {
                     ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                 `}
                 style={{
-                    width: window.innerWidth >= 768 && sidebarOpen ? `${sidebarWidth}px` : '280px',
+                    width: '280px',
                 }}
             >
                 <div className="h-full flex flex-col py-4">
@@ -112,13 +79,12 @@ export default function AdminLayout() {
                                 <h1 className="text-lg font-bold text-gray-800 tracking-tight whitespace-nowrap">POS RFID</h1>
                             )}
                         </div>
-                        {/* Toggle/Close button - different behavior for mobile/desktop */}
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
                             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                             aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
                         >
-                            {sidebarOpen ? <X size={20} className="text-gray-600" /> : <Menu size={20} className="text-gray-600" />}
+                            <X size={20} className="text-gray-600" />
                         </button>
                     </div>
 
@@ -140,29 +106,16 @@ export default function AdminLayout() {
                             >
                                 <item.icon size={20} className={`shrink-0 transition-colors ${isActive(item.path) ? 'text-white' : 'text-gray-400 group-hover:text-primary'}`} />
                                 {sidebarOpen && <span className="font-semibold tracking-wide">{item.label}</span>}
-                                {isActive(item.path) && (
-                                    <div className="absolute right-2 w-1.5 h-1.5 bg-white rounded-full animate-pulse md:block hidden" />
-                                )}
                             </Link>
                         ))}
                     </nav>
                 </div>
-
-                {/* Resize Handle */}
-                {sidebarOpen && (
-                    <div
-                        onMouseDown={() => setIsResizing(true)}
-                        className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-primary/20 active:bg-primary/40 transition-colors hidden md:block group flex items-center justify-center"
-                    >
-                        <div className="w-1 h-16 bg-gray-300 rounded-full group-hover:bg-primary group-hover:scale-110 transition-all" />
-                    </div>
-                )}
             </aside>
 
             {/* Mobile Overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-30 md:hidden"
+                    className="fixed inset-0 bg-black/50 z-30"
                     onClick={() => setSidebarOpen(false)}
                     aria-label="Close sidebar"
                 />
@@ -172,7 +125,7 @@ export default function AdminLayout() {
             <div
                 className="flex-1 flex flex-col transition-all duration-300 min-w-0"
                 style={{
-                    marginLeft: window.innerWidth >= 768 && sidebarOpen ? `${sidebarWidth}px` : '0',
+                    marginLeft: '0',
                 }}
             >
                 {/* Floating Navbar */}
@@ -186,8 +139,6 @@ export default function AdminLayout() {
                         >
                             <Menu size={20} />
                         </button>
-
-                        <h1 className="text-lg font-bold text-primary md:hidden">POS RFID</h1>
 
                         {/* Right: User Profile Dropdown */}
                         <div className="ml-auto flex items-center gap-2">
@@ -262,11 +213,6 @@ export default function AdminLayout() {
                         <Outlet />
                     </div>
                 </main>
-
-                {/* Resize cursor overlay */}
-                {isResizing && (
-                    <div className="fixed inset-0 cursor-col-resize z-50" />
-                )}
             </div>
         </div>
     );
