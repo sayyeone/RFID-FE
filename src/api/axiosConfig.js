@@ -4,6 +4,7 @@ const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
     }
 });
 
@@ -23,7 +24,10 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401){
+        const isLoginRequest = error.config?.url?.includes('login');
+        const isAlreadyOnLoginPage = window.location.pathname === '/login';
+
+        if (error.response?.status === 401 && !isLoginRequest && !isAlreadyOnLoginPage) {
             localStorage.removeItem('token');
             localStorage.removeItem('user');
             window.location.href = '/login';

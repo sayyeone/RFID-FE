@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../api/axiosConfig';
 import { Eye, EyeOff } from 'lucide-react';
@@ -10,26 +10,106 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [showResetPrompt, setShowResetPrompt] = useState(false);
   const { login } = useAuth();
+
+  // Auto-dismiss error after 5 seconds
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError('');
+        setShowResetPrompt(false);
+      }, 5000); // 3 seconds to match user's "3" request
+      return () => clearTimeout(timer);
+    }
+  }, [error]);
+
+  // Reset state when email changes for a "fresh start"
+  useEffect(() => {
+    setFailedAttempts(0);
+    setShowResetPrompt(false);
+    setError('');
+  }, [email]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+
+    // ⛔ hard block double submit
+    if (loading) return;
+
+    // client validation
+    if (password.length > 0 && password.length < 6) {
+      setError('Password must be at least 6 characters');
+      return;
+    }
+
     setLoading(true);
 
     try {
       const response = await api.post('login', { email, password });
       const { token, user } = response.data;
+
+      // success → reset all error-related state
+      setError('');
+      setFailedAttempts(0);
+      setShowResetPrompt(false);
+      localStorage.removeItem('login_failed_attempts');
+
       login(user, token);
     } catch (err) {
-      setError(err.response?.data?.message || 'Email atau password salah. Silakan coba lagi.');
+
+      if (err.response) {
+        const { error_code, message } = err.response.data || {};
+
+        if (error_code === 'user_not_found') {
+          setError('Email tidak terdaftar di sistem');
+          return;
+        }
+
+        if (error_code === 'invalid_password') {
+          const newAttempts = failedAttempts + 1;
+
+          // Update attempts
+          setFailedAttempts(newAttempts);
+          localStorage.setItem('login_failed_attempts', newAttempts.toString());
+
+          // Set error message
+          const msg = newAttempts >= 3
+            ? `Password salah (${newAttempts} kali percobaan). Lupa password?`
+            : `Password yang Anda masukkan salah (${newAttempts}/3)`;
+          setError(msg);
+
+          // Set reset prompt if needed
+          if (newAttempts >= 3) {
+            setShowResetPrompt(true);
+          }
+          return;
+        }
+
+        if (error_code === 'account_inactive') {
+          setError('Akun Anda tidak aktif. Hubungi administrator.');
+          return;
+        }
+
+        setError(message || 'Login gagal. Silakan coba lagi.');
+        return;
+      }
+
+      if (err.request) {
+        setError('Tidak dapat terhubung ke server. Periksa koneksi Anda.');
+        return;
+      }
+
+      setError('Terjadi kesalahan. Silakan coba lagi.');
     } finally {
       setLoading(false);
     }
   };
 
+
   return (
-    <div className="fixed inset-0 w-full h-full flex overflow-hidden z-50 bg-white font-['Open_Sans']">
+    <div className="fixed inset-0 w-full h-full flex overflow-y-auto lg:overflow-hidden z-50 bg-white font-['Open_Sans']">
 
       {/* LEFT SIDE - 60% Illustration Panel (NO BOXES) */}
       <div className="hidden lg:flex lg:w-[60%] bg-gradient-to-br from-[#f0f2ff] via-[#e6e9ff] to-[#f5f7ff] relative overflow-hidden items-center justify-center">
@@ -75,19 +155,40 @@ export default function Login() {
             <span className="text-2xl font-bold text-[#566a7f]">POS RFID</span>
           </div>
 
-          {/* Welcome Header */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-[#566a7f] mb-2">Welcome to POS RFID! 👋</h2>
-            <p className="text-[#a1acb8]">Please sign-in to your account and start the adventure</p>
-          </div>
+          {/* Welcome Header - Hidden when error occurs to focus on feedback */}
+          {!error && (
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-[#566a7f] mb-2">Welcome to POS RFID! 👋</h2>
+              <p className="text-[#a1acb8]">Please sign-in to your account and start the adventure</p>
+            </div>
+          )}
 
           {/* Error Alert */}
           {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6 text-sm flex items-start gap-2">
-              <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <p>{error}</p>
+            <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6 shadow-md animate-shake overflow-hidden relative border border-red-100">
+              <div className="flex items-start gap-3">
+                <svg className="w-6 h-6 flex-shrink-0 mt-0.5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div className="flex-1">
+                  <p className="font-semibold text-sm mb-1">Login Gagal</p>
+                  <p className="text-sm">{error}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setError('')}
+                  className="text-red-400 hover:text-red-600 transition-colors flex-shrink-0"
+                  aria-label="Close"
+                >
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {/* Progress Bar "Loading Dock" */}
+              <div className="absolute bottom-0 left-0 h-1 bg-red-400/30 w-full">
+                <div className="h-full bg-red-500 animate-progress origin-left"></div>
+              </div>
             </div>
           )}
 
@@ -117,8 +218,14 @@ export default function Login() {
                 <label htmlFor="password" className="block text-sm font-semibold text-[#566a7f] uppercase tracking-wide">
                   Password
                 </label>
-                <a href="#" className="text-sm text-primary hover:text-[#5f61e6] font-medium transition-colors">
-                  Forgot Password?
+                <a
+                  href="#"
+                  className={`text-sm font-medium transition-all ${showResetPrompt
+                    ? 'text-red-500 hover:text-red-600 animate-pulse font-bold'
+                    : 'text-primary hover:text-[#5f61e6]'
+                    }`}
+                >
+                  {showResetPrompt ? 'Lupa Password?' : 'Forgot Password?'}
                 </a>
               </div>
               <div className="relative">
@@ -146,6 +253,23 @@ export default function Login() {
                 <p className="text-red-500 text-xs mt-1.5">
                   Password must be more than 6 characters
                 </p>
+              )}
+
+              {/* Password Reset Prompt after 3 failed attempts */}
+              {showResetPrompt && (
+                <div className="mt-3 p-3 bg-red-50 border-l-4 border-red-500 rounded-lg">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-red-700 mb-1">Terlalu banyak percobaan gagal</p>
+                      <p className="text-xs text-red-600">
+                        Jika Anda lupa password, klik <a href="#" className="font-bold underline hover:text-red-800">Lupa Password?</a> di atas untuk reset.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
