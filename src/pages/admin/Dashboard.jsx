@@ -27,7 +27,7 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Fetch all data in parallel
+      // Fetch initial data (default 7 days for revenue)
       const [statsRes, revenueRes, platesRes, transactionsRes] = await Promise.all([
         dashboardApi.getStats(),
         dashboardApi.getRevenue(7),
@@ -43,6 +43,15 @@ export default function AdminDashboard() {
       console.error('Failed to fetch dashboard data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePeriodChange = async (days) => {
+    try {
+      const response = await dashboardApi.getRevenue(days);
+      setRevenueData(response.data.data);
+    } catch (err) {
+      console.error('Failed to fetch revenue data:', err);
     }
   };
 
@@ -87,10 +96,18 @@ export default function AdminDashboard() {
         />
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
-        <RevenueChart data={revenueData} loading={loading} />
-        <PopularPlatesChart data={popularPlates} loading={loading} />
+      {/* Charts Row - Stack on mobile, side-by-side on large screens */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6 mb-4 sm:mb-6 px-1 sm:px-0">
+        <div className="min-h-[350px]">
+          <RevenueChart
+            data={revenueData}
+            loading={loading}
+            onPeriodChange={handlePeriodChange}
+          />
+        </div>
+        <div className="min-h-[350px]">
+          <PopularPlatesChart data={popularPlates} loading={loading} />
+        </div>
       </div>
 
       {/* Recent Transactions */}

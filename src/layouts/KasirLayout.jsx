@@ -1,13 +1,74 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, History, LogOut, Menu, X, LayoutDashboard } from 'lucide-react';
+import { ShoppingCart, History, LogOut, Menu, X, LayoutDashboard, ChevronDown, User } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 export default function KasirLayout() {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarWidth, setSidebarWidth] = useState(264); // Default 264px (w-64 + padding)
+    const [isResizing, setIsResizing] = useState(false);
+    const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
+    const dropdownRef = useRef(null);
+    const sidebarRef = useRef(null);
+
+    const MIN_SIDEBAR_WIDTH = 200;
+    const MAX_SIDEBAR_WIDTH = 400;
+
+    // Auto-open sidebar on desktop
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth >= 768) {
+                setSidebarOpen(true);
+            } else {
+                setSidebarOpen(false);
+            }
+        };
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setProfileDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // Handle sidebar resize
+    useEffect(() => {
+        const handleMouseMove = (e) => {
+            if (!isResizing) return;
+
+            const newWidth = e.clientX;
+            if (newWidth >= MIN_SIDEBAR_WIDTH && newWidth <= MAX_SIDEBAR_WIDTH) {
+                setSidebarWidth(newWidth);
+            }
+        };
+
+        const handleMouseUp = () => {
+            setIsResizing(false);
+        };
+
+        if (isResizing) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isResizing]);
 
     const handleLogout = () => {
         if (window.confirm('Are you sure you want to logout?')) {
@@ -25,69 +86,192 @@ export default function KasirLayout() {
     const isActive = (path) => location.pathname === path;
 
     return (
-        <div className="min-h-screen bg-gray-50 flex">
-            {/* Sidebar */}
-            <aside className={`bg-white border-r border-gray-200 transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'
-                }`}>
-                <div className="h-full flex flex-col">
-                    {/* Header */}
-                    <div className="p-4 border-b border-gray-200 flex items-center justify-between">
-                        {sidebarOpen && (
-                            <h1 className="text-xl font-bold text-primary">POS RFID</h1>
-                        )}
+        <div className="h-screen flex overflow-hidden bg-gray-50">
+            {/* Fixed Sidebar */}
+            <aside
+                ref={sidebarRef}
+                className={`
+                    fixed left-0 top-0 h-screen
+                    bg-white border-r border-gray-200
+                    transition-all duration-300 z-40
+                    ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+                `}
+                style={{
+                    width: window.innerWidth >= 768 && sidebarOpen ? `${sidebarWidth}px` : '280px',
+                }}
+            >
+                <div className="h-full flex flex-col py-4">
+                    {/* Sidebar Header */}
+                    <div className="h-16 flex items-center justify-between px-6 mb-2 shrink-0">
+                        <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
+                                <ShoppingCart className="text-white" size={20} />
+                            </div>
+                            {sidebarOpen && (
+                                <h1 className="text-lg font-bold text-gray-800 tracking-tight whitespace-nowrap">KASIR RFID</h1>
+                            )}
+                        </div>
+                        {/* Toggle/Close button - different behavior for mobile/desktop */}
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="p-2 hover:bg-gray-100 rounded-lg"
+                            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
                         >
-                            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+                            {sidebarOpen ? <X size={20} className="text-gray-600" /> : <Menu size={20} className="text-gray-600" />}
                         </button>
                     </div>
 
-                    {/* Menu Items */}
-                    <nav className="flex-1 p-4 space-y-2">
+                    {/* Navigation */}
+                    <nav className="flex-1 overflow-y-auto px-4 space-y-1">
                         {menuItems.map((item) => (
                             <Link
                                 key={item.path}
                                 to={item.path}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive(item.path)
-                                        ? 'bg-purple-100 text-primary font-semibold'
-                                        : 'text-gray-700 hover:bg-gray-100'
+                                onClick={() => {
+                                    if (window.innerWidth < 768) {
+                                        setSidebarOpen(false);
+                                    }
+                                }}
+                                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all duration-200 group relative ${isActive(item.path)
+                                    ? 'bg-primary text-white shadow-lg shadow-primary/25'
+                                    : 'text-gray-600 hover:bg-gray-100 hover:translate-x-1'
                                     }`}
                             >
-                                <item.icon size={20} />
-                                {sidebarOpen && <span>{item.label}</span>}
+                                <item.icon size={20} className={`shrink-0 transition-colors ${isActive(item.path) ? 'text-white' : 'text-gray-400 group-hover:text-primary'}`} />
+                                {sidebarOpen && <span className="font-semibold tracking-wide">{item.label}</span>}
+                                {isActive(item.path) && (
+                                    <div className="absolute right-2 w-1.5 h-1.5 bg-white rounded-full animate-pulse md:block hidden" />
+                                )}
                             </Link>
                         ))}
                     </nav>
-
-                    {/* User Profile */}
-                    <div className="p-4 border-t border-gray-200">
-                        <div className={`flex items-center gap-3 ${!sidebarOpen && 'justify-center'}`}>
-                            <div className="w-10 h-10 rounded-full bg-purple-100 text-primary flex items-center justify-center font-semibold">
-                                {user?.name?.charAt(0) || 'K'}
-                            </div>
-                            {sidebarOpen && (
-                                <div className="flex-1">
-                                    <p className="text-sm font-semibold text-gray-800">{user?.name || 'Kasir'}</p>
-                                    <p className="text-xs text-gray-500 capitalize">{user?.role || 'kasir'}</p>
-                                </div>
-                            )}
-                        </div>
-                        <button
-                            onClick={handleLogout}
-                            className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors font-medium"
-                        >
-                            <LogOut size={18} />
-                            {sidebarOpen && <span>Logout</span>}
-                        </button>
-                    </div>
                 </div>
+
+                {/* Resize Handle */}
+                {sidebarOpen && (
+                    <div
+                        onMouseDown={() => setIsResizing(true)}
+                        className="absolute right-0 top-0 bottom-0 w-2 cursor-col-resize hover:bg-primary/20 active:bg-primary/40 transition-colors hidden md:block group flex items-center justify-center"
+                    >
+                        <div className="w-1 h-16 bg-gray-300 rounded-full group-hover:bg-primary group-hover:scale-110 transition-all" />
+                    </div>
+                )}
             </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 p-8 overflow-y-auto">
-                <Outlet />
-            </main>
+            {/* Mobile Overlay */}
+            {sidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/50 z-30 md:hidden"
+                    onClick={() => setSidebarOpen(false)}
+                    aria-label="Close sidebar"
+                />
+            )}
+
+            {/* Main Content Wrapper */}
+            <div
+                className="flex-1 flex flex-col transition-all duration-300 min-w-0"
+                style={{
+                    marginLeft: window.innerWidth >= 768 && sidebarOpen ? `${sidebarWidth}px` : '0',
+                }}
+            >
+                {/* Floating Navbar */}
+                <div className="px-4 pt-4 md:px-8 md:pt-4 sticky top-0 z-20">
+                    <header className="h-16 bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg shadow-gray-200/50 flex items-center justify-between px-4 md:px-6">
+                        {/* Left: Sidebar toggle button */}
+                        <button
+                            onClick={() => setSidebarOpen(!sidebarOpen)}
+                            className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-600"
+                            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+                        >
+                            <Menu size={20} />
+                        </button>
+
+                        <h1 className="text-lg font-bold text-primary md:hidden">KASIR RFID</h1>
+
+                        {/* Right: User Profile Dropdown */}
+                        <div className="ml-auto flex items-center gap-2">
+                            <div className="hidden lg:flex items-center gap-1 px-3 py-1.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-600">
+                                <span>Star</span>
+                                <span className="px-1.5 bg-white rounded border border-gray-200">99+</span>
+                            </div>
+
+                            <div className="relative" ref={dropdownRef}>
+                                <button
+                                    onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+                                    className="flex items-center gap-3 p-1 hover:bg-gray-100 rounded-2xl transition-all group"
+                                >
+                                    <div className="relative">
+                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 text-white flex items-center justify-center font-bold shadow-md border-2 border-white overflow-hidden ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
+                                            {user?.name?.charAt(0).toUpperCase() || 'K'}
+                                        </div>
+                                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full" />
+                                    </div>
+                                    <div className="hidden sm:block text-left">
+                                        <p className="text-sm font-bold text-gray-800 leading-tight group-hover:text-primary transition-colors">{user?.name || 'Kasir'}</p>
+                                        <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold leading-tight">{user?.role || 'kasir'}</p>
+                                    </div>
+                                    <ChevronDown size={14} className={`text-gray-400 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {/* Dropdown Menu */}
+                                {profileDropdownOpen && (
+                                    <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-2xl shadow-xl py-2 overflow-hidden">
+                                        {/* User Info Header */}
+                                        <div className="px-4 py-3 border-b border-gray-100">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 text-white flex items-center justify-center font-semibold text-lg shadow-md">
+                                                    {user?.name?.charAt(0).toUpperCase() || 'K'}
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-semibold text-gray-800 truncate">{user?.name || 'Kasir'}</p>
+                                                    <p className="text-xs text-gray-500 capitalize truncate">{user?.role || 'kasir'}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Menu Items */}
+                                        <div className="py-2">
+                                            <button
+                                                onClick={() => {
+                                                    setProfileDropdownOpen(false);
+                                                    navigate('/kasir/profile');
+                                                }}
+                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors text-sm"
+                                            >
+                                                <User size={18} className="text-gray-500" />
+                                                <span className="font-medium">My Profile</span>
+                                            </button>
+                                        </div>
+
+                                        {/* Logout */}
+                                        <div className="border-t border-gray-100 pt-2">
+                                            <button
+                                                onClick={handleLogout}
+                                                className="w-full flex items-center gap-3 px-4 py-2.5 text-red-600 hover:bg-red-50 transition-colors text-sm font-medium"
+                                            >
+                                                <LogOut size={18} />
+                                                <span>Log Out</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </header>
+                </div>
+
+                {/* Main Content Area */}
+                <main className="flex-1 overflow-y-auto">
+                    <div className="p-4 md:p-8">
+                        <Outlet />
+                    </div>
+                </main>
+
+                {/* Resize cursor overlay */}
+                {isResizing && (
+                    <div className="fixed inset-0 cursor-col-resize z-50" />
+                )}
+            </div>
         </div>
     );
 }
