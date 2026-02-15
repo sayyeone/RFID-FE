@@ -114,8 +114,8 @@ export default function PlateManagement() {
       'confirm',
       async () => {
         try {
-          await api.delete(`/ plates / ${plate.id} `); // Changed API call
-          showAlert('Berhasil', 'Plate telah berhasil dihapus.', 'success'); // Changed alert
+          await api.delete(`/plates/${plate.id}`);
+          showAlert('Berhasil', 'Plate telah berhasil dihapus.', 'success');
           fetchPlates();
         } catch (err) {
           showAlert('Gagal', 'Gagal menghapus plate: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error'); // Changed alert
@@ -129,8 +129,8 @@ export default function PlateManagement() {
     try {
       if (selectedPlate) {
         // Update
-        await api.put(`/ plates / ${selectedPlate.id} `, formData); // Changed API call
-        showAlert('Berhasil', 'Data plate berhasil diperbarui.', 'success'); // Changed alert
+        await api.put(`/plates/${selectedPlate.id}`, formData);
+        showAlert('Berhasil', 'Data plate berhasil diperbarui.', 'success');
       } else {
         // Create
         await api.post('/plates', formData); // Changed API call

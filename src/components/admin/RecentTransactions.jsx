@@ -16,8 +16,14 @@ export default function RecentTransactions({ transactions, loading }) {
           <Clock className="text-primary" size={24} />
           <h3 className="text-lg font-semibold text-gray-800">Recent Transactions</h3>
         </div>
-        <div className="text-center py-8 text-gray-400">
-          No transactions yet
+        <div className="text-center py-12">
+          <div className="mb-4 flex justify-center opacity-20">
+            <Clock size={56} className="text-gray-400" />
+          </div>
+          <h4 className="text-lg font-semibold text-gray-700 mb-2">Belum Ada Transaksi</h4>
+          <p className="text-sm text-gray-500 max-w-sm mx-auto">
+            Transaksi akan muncul di sini setelah pelanggan menyelesaikan pembelian pertama mereka.
+          </p>
         </div>
       </div>
     );
@@ -32,8 +38,8 @@ export default function RecentTransactions({ transactions, loading }) {
 
       <div className="space-y-3">
         {transactions.map((transaction) => (
-          <div 
-            key={transaction.id} 
+          <div
+            key={transaction.id}
             className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
           >
             <div className="flex-1">

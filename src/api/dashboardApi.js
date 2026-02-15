@@ -19,5 +19,10 @@ export const dashboardApi = {
   // Get recent transactions
   getRecentTransactions: (limit = 10) => {
     return api.get(`/dashboard/recent-transactions?limit=${limit}`);
+  },
+
+  // Get activity logs
+  getActivities: (limit = 10) => {
+    return api.get(`/dashboard/activities?limit=${limit}`);
   }
 };
