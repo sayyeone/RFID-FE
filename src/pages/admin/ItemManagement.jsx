@@ -155,13 +155,13 @@ export default function ItemManagement() {
                 <div className="flex items-center gap-3">
                     <Package size={32} className="text-primary" />
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800">Item Management</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Item Management</h1>
                         <p className="text-gray-500 text-sm">Manage menu items and pricing</p>
                     </div>
                 </div>
-                <button onClick={handleCreate} className="btn-primary">
-                    <Plus size={20} className="inline mr-2" />
-                    Add Item
+                <button onClick={handleCreate} className="btn-primary whitespace-nowrap flex items-center">
+                    <Plus size={20} />
+                    <span className="ml-2 hidden md:inline">Add Item</span>
                 </button>
             </div>
 
@@ -191,9 +191,9 @@ export default function ItemManagement() {
                     </select>
                 </div>
 
-                <div className="flex gap-4 mt-4 text-sm text-gray-600">
-                    <span>Total: <strong>{totalItems}</strong></span>
-                    <span>Showing: <strong>{displayedItems.length}</strong> of {totalItems}</span>
+                <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-600">
+                    <span className="whitespace-nowrap">Total: <strong>{totalItems}</strong></span>
+                    <span className="whitespace-nowrap">Showing: <strong>{displayedItems.length}</strong> of {totalItems}</span>
                     {/* Pagination Settings */}
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-500">Show</span>
@@ -221,7 +221,7 @@ export default function ItemManagement() {
                 ) : (
                     <div className="overflow-x-auto -mx-4 sm:mx-0">
                         <div className="inline-block min-w-full align-middle">
-                            <table className="w-full min-w-[640px]">
+                            <table className="w-full min-w-[768px]">
                                 <thead>
                                     <tr className="border-b border-gray-200">
                                         <th className="text-left py-3 px-4 font-semibold text-gray-700">Item Name</th>
@@ -234,7 +234,9 @@ export default function ItemManagement() {
                                 <tbody>
                                     {displayedItems.map(item => (
                                         <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                            <td className="py-3 px-4">{item.nama_item}</td>
+                                            <td className={`py-3 px-4 text-sm ${item.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                                                {item.nama_item}
+                                            </td>
                                             <td className="py-3 px-4">
                                                 {KATEGORI_CONFIG[item.kategori] && (() => {
                                                     const config = KATEGORI_CONFIG[item.kategori];
@@ -247,7 +249,7 @@ export default function ItemManagement() {
                                                     );
                                                 })()}
                                             </td>
-                                            <td className="py-3 px-4">Rp {item.harga.toLocaleString('id-ID')}</td>
+                                            <td className="py-3 px-4 text-sm text-gray-600">Rp {item.harga.toLocaleString('id-ID')}</td>
                                             <td className="py-3 px-4">
                                                 {item.status === '1' ? (
                                                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -290,22 +292,22 @@ export default function ItemManagement() {
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="flex justify-between items-center mt-6 pt-6 border-t border-gray-200">
-                        <p className="text-sm text-gray-600">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-6 border-t border-gray-200">
+                        <p className="text-sm text-gray-600 text-center sm:text-left">
                             Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
                         </p>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full sm:w-auto">
                             <button
                                 disabled={currentPage === 1}
                                 onClick={() => setCurrentPage(prev => prev - 1)}
-                                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 sm:flex-none px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 Previous
                             </button>
                             <button
                                 disabled={currentPage === totalPages}
                                 onClick={() => setCurrentPage(prev => prev + 1)}
-                                className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 sm:flex-none px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 Next
                             </button>

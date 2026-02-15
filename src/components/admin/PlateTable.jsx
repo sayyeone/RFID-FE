@@ -20,74 +20,76 @@ export default function PlateTable({ plates, onEdit, onDelete, loading }) {
   }
 
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full">
-        <thead className="bg-gray-50 border-b border-gray-200">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              RFID UID
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Plate Name
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Price
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {plates.map((plate) => (
-            <tr key={plate.id} className="hover:bg-gray-50 transition-colors">
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className="font-mono text-sm text-gray-900">{plate.rfid_uid}</span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className="text-sm font-medium text-gray-900">{plate.name}</span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <span className="text-sm text-gray-900">
-                  Rp {plate.price.toLocaleString('id-ID')}
-                </span>
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                {plate.is_active ? (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    <CheckCircle size={14} />
-                    Active
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                    <XCircle size={14} />
-                    Inactive
-                  </span>
-                )}
-              </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onEdit(plate)}
-                    className="text-blue-600 hover:text-blue-900 p-1 hover:bg-blue-50 rounded transition-colors"
-                  >
-                    <Edit2 size={18} />
-                  </button>
-                  <button
-                    onClick={() => onDelete(plate)}
-                    className="text-red-600 hover:text-red-900 p-1 hover:bg-red-50 rounded transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              </td>
+    <div className="overflow-x-auto -mx-4 sm:mx-0">
+      <div className="inline-block min-w-full align-middle">
+        <table className="w-full min-w-[768px]">
+          <thead>
+            <tr className="border-b border-gray-200">
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                RFID UID
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Plate Name
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Price
+              </th>
+              <th className="px-4 py-3 text-left font-semibold text-gray-700">
+                Status
+              </th>
+              <th className="px-4 py-3 text-center font-semibold text-gray-700">
+                Actions
+              </th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {plates.map((plate) => (
+              <tr key={plate.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                  {plate.rfid_uid}
+                </td>
+                <td className={`px-4 py-3 whitespace-nowrap text-sm ${plate.is_active ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                  {plate.name}
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                  Rp {plate.price.toLocaleString('id-ID')}
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap">
+                  {plate.is_active ? (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <CheckCircle size={14} />
+                      Active
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                      <XCircle size={14} />
+                      Inactive
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+                  <div className="flex items-center justify-center gap-2">
+                    <button
+                      onClick={() => onEdit(plate)}
+                      className="text-blue-600 hover:text-blue-900 p-1.5 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="Edit Plate"
+                    >
+                      <Edit2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => onDelete(plate)}
+                      className="text-red-600 hover:text-red-900 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Delete Plate"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

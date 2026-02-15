@@ -131,13 +131,13 @@ export default function UserManagement() {
                 <div className="flex items-center gap-3">
                     <Users size={32} className="text-primary" />
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-800">User Management</h1>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">User Management</h1>
                         <p className="text-gray-500 text-sm">Manage system users and roles</p>
                     </div>
                 </div>
-                <button onClick={handleCreate} className="btn-primary">
-                    <Plus size={20} className="inline mr-2" />
-                    Add User
+                <button onClick={handleCreate} className="btn-primary whitespace-nowrap flex items-center">
+                    <Plus size={20} />
+                    <span className="ml-2 hidden md:inline">Add User</span>
                 </button>
             </div>
 
@@ -166,15 +166,15 @@ export default function UserManagement() {
                     </select>
                 </div>
 
-                <div className="flex gap-4 mt-4 text-sm text-gray-600">
-                    <span>Total: <strong>{totalItems}</strong></span>
-                    <span>Showing: <strong>{filteredUsers.length}</strong> of {totalItems}</span>
+                <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-600">
+                    <span className="whitespace-nowrap">Total: <strong>{totalItems}</strong></span>
+                    <span className="whitespace-nowrap">Showing: <strong>{filteredUsers.length}</strong> of {totalItems}</span>
                     <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-400">Show:</span>
+                        <span className="text-sm text-gray-500">Show</span>
                         <select
                             value={perPage}
                             onChange={(e) => setPerPage(Number(e.target.value))}
-                            className="text-xs border border-gray-200 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-purple-500"
+                            className="px-2 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 outline-none"
                         >
                             <option value={10}>10</option>
                             <option value={25}>25</option>
@@ -193,92 +193,96 @@ export default function UserManagement() {
                         <p className="text-gray-500">Loading users...</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b border-gray-200">
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                                    <th className="text-center py-3 px-4 font-semibold text-gray-700">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredUsers.map(user => (
-                                    <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                        <td className="py-3 px-4 font-medium">{user.name}</td>
-                                        <td className="py-3 px-4">
-                                            <div className="flex items-center gap-2 text-gray-600">
-                                                <Mail size={16} />
-                                                {user.email}
-                                            </div>
-                                        </td>
-                                        <td className="py-3 px-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${user.role === 'admin'
-                                                ? 'bg-purple-100 text-purple-700'
-                                                : 'bg-blue-100 text-blue-700'
-                                                }`}>
-                                                <Shield size={16} />
-                                                <span className="capitalize">{user.role}</span>
-                                            </span>
-                                        </td>
-                                        <td className="py-3 px-4">
-                                            {user.status === '1' ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                    <CheckCircle size={14} />
-                                                    Active
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                    <XCircle size={14} />
-                                                    Inactive
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="py-3 px-4">
-                                            <div className="flex items-center justify-center gap-2">
-                                                <button
-                                                    onClick={() => handleEdit(user)}
-                                                    className="text-blue-600 hover:text-blue-900 p-1.5 hover:bg-blue-50 rounded-lg transition-colors"
-                                                    title="Edit User"
-                                                >
-                                                    <Edit2 size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(user)}
-                                                    className="text-red-600 hover:text-red-900 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                                                    title="Delete User"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </div>
-                                        </td>
+                    <div className="overflow-x-auto -mx-4 sm:mx-0">
+                        <div className="inline-block min-w-full align-middle">
+                            <table className="w-full min-w-[768px]">
+                                <thead>
+                                    <tr className="border-b border-gray-200">
+                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
+                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
+                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
+                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                        <th className="text-center py-3 px-4 font-semibold text-gray-700">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {filteredUsers.map(user => (
+                                        <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                            <td className={`py-3 px-4 text-sm ${user.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                                                {user.name}
+                                            </td>
+                                            <td className="py-3 px-4">
+                                                <div className="flex items-center gap-2 text-gray-600">
+                                                    <Mail size={16} />
+                                                    {user.email}
+                                                </div>
+                                            </td>
+                                            <td className="py-3 px-4">
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${user.role === 'admin'
+                                                    ? 'bg-purple-100 text-purple-700'
+                                                    : 'bg-blue-100 text-blue-700'
+                                                    }`}>
+                                                    <Shield size={16} />
+                                                    <span className="capitalize">{user.role}</span>
+                                                </span>
+                                            </td>
+                                            <td className="py-3 px-4">
+                                                {user.status === '1' ? (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <CheckCircle size={14} />
+                                                        Active
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        <XCircle size={14} />
+                                                        Inactive
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="py-3 px-4">
+                                                <div className="flex items-center justify-center gap-2">
+                                                    <button
+                                                        onClick={() => handleEdit(user)}
+                                                        className="text-blue-600 hover:text-blue-900 p-1.5 hover:bg-blue-50 rounded-lg transition-colors"
+                                                        title="Edit User"
+                                                    >
+                                                        <Edit2 size={18} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(user)}
+                                                        className="text-red-600 hover:text-red-900 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
+                                                        title="Delete User"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 )}
 
                 {/* Pagination */}
                 {totalPages > 1 && (
-                    <div className="flex justify-between items-center mt-6 pt-6 border-t border-gray-200">
-                        <p className="text-sm text-gray-600">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-6 border-t border-gray-200">
+                        <p className="text-sm text-gray-600 text-center sm:text-left">
                             Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
                         </p>
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full sm:w-auto">
                             <button
                                 disabled={currentPage === 1}
                                 onClick={() => setCurrentPage(prev => prev - 1)}
-                                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 sm:flex-none px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 Previous
                             </button>
                             <button
                                 disabled={currentPage === totalPages}
                                 onClick={() => setCurrentPage(prev => prev + 1)}
-                                className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="flex-1 sm:flex-none px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 Next
                             </button>

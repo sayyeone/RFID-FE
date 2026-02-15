@@ -64,7 +64,7 @@ export default function PlateManagement() {
         params.search = searchQuery;
       }
 
-      const response = await api.get('/plates', { params }); // Changed API call
+      const response = await api.get('/plates', { params });
       setPlates(response.data.data || []);
 
       // Update pagination metadata
@@ -118,7 +118,7 @@ export default function PlateManagement() {
           showAlert('Berhasil', 'Plate telah berhasil dihapus.', 'success');
           fetchPlates();
         } catch (err) {
-          showAlert('Gagal', 'Gagal menghapus plate: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error'); // Changed alert
+          showAlert('Gagal', 'Gagal menghapus plate: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error');
         }
       }
     );
@@ -133,14 +133,14 @@ export default function PlateManagement() {
         showAlert('Berhasil', 'Data plate berhasil diperbarui.', 'success');
       } else {
         // Create
-        await api.post('/plates', formData); // Changed API call
-        showAlert('Berhasil', 'Plate baru telah ditambahkan.', 'success'); // Changed alert
+        await api.post('/plates', formData);
+        showAlert('Berhasil', 'Plate baru telah ditambahkan.', 'success');
       }
       setShowForm(false);
       fetchPlates();
     } catch (err) {
       console.error('Failed to save plate:', err);
-      showAlert('Gagal Menyimpan', 'Terjadi kesalahan: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error'); // Changed alert
+      showAlert('Gagal Menyimpan', 'Terjadi kesalahan: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error');
     } finally {
       setFormLoading(false);
     }
@@ -156,17 +156,18 @@ export default function PlateManagement() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <Package size={32} className="text-primary" />
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">Plate Management</h1>
+      {/* Header */}
+      <div className="flex flex-row items-center justify-between mb-6">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <Package size={32} className="text-primary flex-shrink-0" />
+          <div className="min-w-0">
+            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">Plate Management</h1>
             <p className="text-gray-500 text-sm">Manage RFID plates and pricing</p>
           </div>
         </div>
-        <button onClick={handleCreate} className="btn-primary">
-          <Plus size={20} className="inline mr-2" />
-          Add Plate
+        <button onClick={handleCreate} className="btn-primary flex items-center gap-2 whitespace-nowrap ml-4">
+          <Plus size={20} />
+          <span className="hidden md:inline">Add Plate</span>
         </button>
       </div>
 
@@ -198,15 +199,15 @@ export default function PlateManagement() {
         </div>
 
         {/* Stats */}
-        <div className="flex gap-4 mt-4 text-sm text-gray-600">
-          <span>Total: <strong>{totalItems}</strong></span>
-          <span>Showing: <strong>{filteredPlates.length}</strong> of {totalItems}</span>
+        <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-600">
+          <span className="whitespace-nowrap">Total: <strong>{totalItems}</strong></span>
+          <span className="whitespace-nowrap">Showing: <strong>{filteredPlates.length}</strong> of {totalItems}</span>
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">Show:</span>
+            <span className="text-sm text-gray-500">Show</span>
             <select
               value={perPage}
               onChange={(e) => setPerPage(Number(e.target.value))}
-              className="text-xs border border-gray-200 rounded px-1 py-0.5 outline-none focus:ring-1 focus:ring-purple-500"
+              className="px-2 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 outline-none"
             >
               <option value={10}>10</option>
               <option value={25}>25</option>
@@ -228,22 +229,22 @@ export default function PlateManagement() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="flex justify-between items-center mt-6 pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-600">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-6 border-t border-gray-200">
+            <p className="text-sm text-gray-600 text-center sm:text-left">
               Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-2 w-full sm:w-auto">
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(prev => prev - 1)}
-                className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 sm:flex-none px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Previous
               </button>
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(prev => prev + 1)}
-                className="px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 sm:flex-none px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 Next
               </button>
