@@ -30,70 +30,75 @@ export default function ActivityFeed({ activities = [] }) {
     };
 
     return (
-        <div className="card h-full">
-            <div className="flex items-center justify-between mb-8">
+        <div className="card h-[500px] flex flex-col">
+            {/* Header - Fixed */}
+            <div className="flex items-center justify-between mb-6 shrink-0">
                 <div className="flex items-center gap-2">
                     <Bell className="text-primary" size={24} />
                     <h3 className="text-lg font-semibold text-gray-800">Activity Timeline</h3>
                 </div>
-                <button className="text-gray-400 hover:text-gray-600 transition-colors">
+                <button className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors">
                     <Info size={18} />
                 </button>
             </div>
 
-            <div className="relative pl-6">
-                {/* Timeline Line */}
-                <div className="absolute left-[30px] top-2 bottom-2 w-0.5 bg-gray-100" />
+            {/* Scrollable Content Area - matched with Recent Transactions */}
+            <div className="flex-1 overflow-y-auto overflow-x-hidden pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+                <div className="relative pl-6">
+                    {/* Timeline Line */}
+                    <div className="absolute left-[30px] top-2 bottom-2 w-0.5 bg-gray-100" />
 
-                <div className="space-y-8">
-                    {activities.length > 0 ? (
-                        activities.map((act) => {
-                            const config = getActionConfig(act.action, act.model);
-                            const Icon = config.icon;
+                    <div className="space-y-6 pb-2">
+                        {activities.length > 0 ? (
+                            activities.map((act) => {
+                                const config = getActionConfig(act.action, act.model);
+                                const Icon = config.icon;
 
-                            return (
-                                <div key={act.id} className="relative flex gap-4 pr-2 group">
-                                    {/* Timeline Dot & Icon */}
-                                    <div className={`absolute -left-[6px] z-10 w-3 h-3 rounded-full border-2 border-white ${config.color}`} />
+                                return (
+                                    <div key={act.id} className="relative flex gap-4 pr-2 group">
+                                        {/* Timeline Dot & Icon */}
+                                        <div className={`absolute -left-[6px] z-10 w-3 h-3 rounded-full border-2 border-white ${config.color}`} />
 
-                                    <div className="flex-1 ml-4 -mt-1">
-                                        <div className="flex items-center justify-between mb-1">
-                                            <h4 className="text-sm font-bold text-gray-800 group-hover:text-primary transition-colors">
-                                                {act.description}
-                                            </h4>
-                                            <span className="text-[11px] text-gray-400 whitespace-nowrap ml-2">
-                                                {formatTime(act.created_at)}
-                                            </span>
-                                        </div>
-
-                                        <div className="flex items-center gap-2 mt-2">
-                                            <div className={`p-1.5 rounded-lg ${config.bgColor} ${config.textColor}`}>
-                                                <Icon size={14} />
+                                        <div className="flex-1 ml-4 -mt-1">
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1">
+                                                <h4 className="text-sm font-bold text-gray-800 group-hover:text-primary transition-colors leading-tight">
+                                                    {act.description}
+                                                </h4>
+                                                <span className="text-[10px] sm:text-[11px] text-gray-400 whitespace-nowrap">
+                                                    {formatTime(act.created_at)}
+                                                </span>
                                             </div>
-                                            <p className="text-xs text-gray-500">
-                                                {act.user?.name || 'System'} • {act.model || 'General'}
-                                            </p>
-                                        </div>
 
-                                        {/* Optional: Show extra details if properties exist */}
-                                        {act.properties && act.action === 'paid' && (
-                                            <div className="mt-3 p-2 bg-gray-50 rounded-lg border border-gray-100 flex items-center gap-2">
-                                                <ShoppingCart size={14} className="text-green-500" />
-                                                <span className="text-[11px] font-semibold text-gray-600">Payment Verified</span>
+                                            <div className="flex items-center gap-2 mt-2">
+                                                <div className={`p-1.5 rounded-lg ${config.bgColor} ${config.textColor}`}>
+                                                    <Icon size={14} />
+                                                </div>
+                                                <p className="text-xs text-gray-500">
+                                                    {act.user?.name || 'System'} • {act.model || 'General'}
+                                                </p>
                                             </div>
-                                        )}
+
+                                            {/* Optional: Show extra details if properties exist */}
+                                            {act.properties && act.action === 'paid' && (
+                                                <div className="mt-3 p-2 bg-gray-50 rounded-lg border border-gray-100 flex items-center gap-2">
+                                                    <ShoppingCart size={14} className="text-green-500" />
+                                                    <span className="text-[11px] font-semibold text-gray-600">Payment Verified</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            );
-                        })
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-10 opacity-40">
-                            <Bell size={40} className="mb-2" />
-                            <p className="text-sm">No activities yet</p>
-                        </div>
-                    )}
+                                );
+                            })
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-20 opacity-40">
+                                <Bell size={40} className="mb-2 text-gray-400" />
+                                <p className="text-sm text-gray-500">No activities yet</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
+
         </div>
     );
 }

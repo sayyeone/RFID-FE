@@ -74,34 +74,36 @@ export default function RevenueChart({ data, loading, onPeriodChange }) {
         </div>
 
         {/* Filter Controls */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col xl:flex-row gap-3">
           {/* Quick Filters */}
-          <select
-            value={period}
-            onChange={handlePeriodChangeLocal}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer hover:bg-gray-50 transition-colors bg-white"
-          >
-            <option value="12months">Last 12 Months</option>
-            <option value="custom">Custom Range</option>
-          </select>
+          <div className="flex-1 min-w-[140px]">
+            <select
+              value={period}
+              onChange={handlePeriodChangeLocal}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer hover:bg-gray-50 transition-colors bg-white font-medium"
+            >
+              <option value="12months">Last 12 Months</option>
+              <option value="custom">Custom Range</option>
+            </select>
+          </div>
 
           {/* Custom Date Range inputs (conditional) */}
           {period === 'custom' && (
-            <div className="flex items-center gap-2 w-full sm:w-auto animate-in fade-in slide-in-from-top-1">
+            <div className="flex items-center gap-2 w-full xl:w-auto animate-in fade-in slide-in-from-top-1">
               <input
                 type="date"
-                className="px-2 py-1.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 xl:w-32 px-2 py-1.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary"
                 placeholder="Start Date"
               />
               <span className="text-gray-400 text-xs">-</span>
               <input
                 type="date"
-                className="px-2 py-1.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary"
+                className="flex-1 xl:w-32 px-2 py-1.5 border border-gray-300 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary"
                 placeholder="End Date"
               />
               <button
                 onClick={() => alert('Custom date range filter will be connected to backend')}
-                className="p-2 bg-gray-100 hover:bg-gray-200 text-primary rounded-lg transition-colors"
+                className="p-2 bg-gray-100 hover:bg-gray-200 text-primary rounded-lg transition-colors shrink-0"
                 title="Apply custom range"
               >
                 <TrendingUp size={16} />
@@ -109,46 +111,50 @@ export default function RevenueChart({ data, loading, onPeriodChange }) {
             </div>
           )}
 
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {/* Month Selector */}
-            <select
-              value={customMonth}
-              onChange={(e) => setCustomMonth(parseInt(e.target.value))}
-              className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer hover:bg-gray-50 transition-colors bg-white"
-            >
-              <option value="1">Januari</option>
-              <option value="2">Februari</option>
-              <option value="3">Maret</option>
-              <option value="4">April</option>
-              <option value="5">Mei</option>
-              <option value="6">Juni</option>
-              <option value="7">Juli</option>
-              <option value="8">Agustus</option>
-              <option value="9">September</option>
-              <option value="10">Oktober</option>
-              <option value="11">November</option>
-              <option value="12">Desember</option>
-            </select>
+          <div className="flex flex-wrap items-center gap-2 w-full xl:w-auto">
+            <div className="flex items-center gap-2 flex-1 sm:flex-initial min-w-[120px]">
+              {/* Month Selector */}
+              <select
+                value={customMonth}
+                onChange={(e) => setCustomMonth(parseInt(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer hover:bg-gray-50 transition-colors bg-white font-medium"
+              >
+                <option value="1">Januari</option>
+                <option value="2">Februari</option>
+                <option value="3">Maret</option>
+                <option value="4">April</option>
+                <option value="5">Mei</option>
+                <option value="6">Juni</option>
+                <option value="7">Juli</option>
+                <option value="8">Agustus</option>
+                <option value="9">September</option>
+                <option value="10">Oktober</option>
+                <option value="11">November</option>
+                <option value="12">Desember</option>
+              </select>
+            </div>
 
-            {/* Year Selector */}
-            <select
-              value={customYear}
-              onChange={(e) => setCustomYear(parseInt(e.target.value))}
-              className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer hover:bg-gray-50 transition-colors bg-white"
-            >
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
-              <option value="2025">2025</option>
-              <option value="2026">2026</option>
-            </select>
+            <div className="flex items-center gap-2 flex-1 sm:flex-initial min-w-[100px]">
+              {/* Year Selector */}
+              <select
+                value={customYear}
+                onChange={(e) => setCustomYear(parseInt(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer hover:bg-gray-50 transition-colors bg-white font-medium"
+              >
+                <option value="2023">2023</option>
+                <option value="2024">2024</option>
+                <option value="2025">2025</option>
+                <option value="2026">2026</option>
+              </select>
+            </div>
 
             {/* Apply Month/Year Filter Button */}
             <button
               onClick={handleMonthYearFilter}
-              className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-semibold hover:bg-purple-700 transition-colors flex items-center gap-2 justify-center"
+              className="flex-1 sm:flex-initial px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold hover:bg-purple-700 transition-all hover:shadow-md flex items-center gap-2 justify-center shrink-0 active:scale-95"
             >
               <Calendar size={16} />
-              <span className="hidden sm:inline">Apply</span>
+              <span>Apply</span>
             </button>
           </div>
         </div>

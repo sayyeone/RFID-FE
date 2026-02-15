@@ -128,7 +128,20 @@ export default function ItemManagement() {
             setShowForm(false);
             fetchItems();
         } catch (err) {
-            showAlert('Gagal Menyimpan', 'Terjadi kesalahan: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error');
+            const data = err.response?.data;
+            if (data?.existing_id) {
+                showAlert(
+                    'Item Sudah Ada',
+                    data.message + ' Apakah Anda ingin mencari item tersebut untuk diedit?',
+                    'confirm',
+                    () => {
+                        setSearchQuery(formData.nama_item || '');
+                        setShowForm(false);
+                    }
+                );
+            } else {
+                showAlert('Gagal Menyimpan', 'Terjadi kesalahan: ' + (data?.message || 'Error tidak diketahui'), 'error');
+            }
         }
     };
 
@@ -180,7 +193,7 @@ export default function ItemManagement() {
 
                 <div className="flex gap-4 mt-4 text-sm text-gray-600">
                     <span>Total: <strong>{totalItems}</strong></span>
-                    <span>Showing: <strong>{filteredItems.length}</strong> of {totalItems}</span>
+                    <span>Showing: <strong>{displayedItems.length}</strong> of {totalItems}</span>
                     {/* Pagination Settings */}
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-500">Show</span>

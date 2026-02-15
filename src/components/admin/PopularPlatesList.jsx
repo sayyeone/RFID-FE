@@ -49,7 +49,7 @@ export default function PopularPlatesList({ data, loading }) {
                         const isTopOne = index === 0;
 
                         return (
-                            <div key={plate.name} className="group cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition-colors">
+                            <div key={plate.id} className="group cursor-pointer hover:bg-gray-50 p-3 rounded-lg transition-colors">
                                 <div className="flex items-center justify-between mb-2">
                                     <div className="flex items-center gap-3">
                                         <span className="text-xs font-bold text-gray-400 w-6">#{index + 1}</span>
