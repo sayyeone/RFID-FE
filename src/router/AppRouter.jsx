@@ -41,7 +41,7 @@ export default function AppRouter() {
             {/* Kasir Routes */}
             <Route path="/kasir" element={<PrivateRoute />}>
                 <Route element={<RoleRoute allowedRoles={['kasir']}><KasirLayout /></RoleRoute>}>
-                    <Route path="" element={<Navigate to="/kasir/dashboard" replace />} />
+                    <Route path="" element={<Navigate to="/kasir/pos" replace />} />
                     <Route path="dashboard" element={<KasirDashboard />} />
                     <Route path="pos" element={<KasirPOS />} />
                     <Route path="history" element={<KasirHistory />} />

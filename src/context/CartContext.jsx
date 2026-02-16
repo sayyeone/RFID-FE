@@ -10,11 +10,8 @@ export const CartProvider = ({ children }) => {
             const existingItem = prev.find(item => item.rfid_uid === plate.rfid_uid);
 
             if (existingItem) {
-                return prev.map(item =>
-                    item.rfid_uid === plate.rfid_uid
-                        ? { ...item, quantity: item.quantity + 1 }
-                        : item
-                );
+                // If the same physical plate is scanned again, do nothing (keep at 1)
+                return prev;
             } else {
                 return [...prev, { ...plate, quantity: 1 }];
             }

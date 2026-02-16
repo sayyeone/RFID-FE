@@ -165,10 +165,6 @@ export default function PlateManagement() {
             <p className="text-gray-500 text-sm">Manage RFID plates and pricing</p>
           </div>
         </div>
-        <button onClick={handleCreate} className="btn-primary flex items-center gap-2 whitespace-nowrap ml-4">
-          <Plus size={20} />
-          <span className="hidden md:inline">Add Plate</span>
-        </button>
       </div>
 
       {/* Filters */}
@@ -215,6 +211,16 @@ export default function PlateManagement() {
               <option value={100}>100</option>
             </select>
           </div>
+
+          <button
+            onClick={() => {
+              setSearchQuery('');
+              setFilterStatus('all');
+            }}
+            className="ml-auto text-xs font-bold text-primary hover:underline uppercase tracking-tight"
+          >
+            Reset Filters
+          </button>
         </div>
       </div>
 

@@ -190,6 +190,16 @@ export default function UserManagement() {
                         <option value={50}>50</option>
                         <option value={100}>100</option>
                     </select>
+
+                    <button
+                        onClick={() => {
+                            setSearchQuery('');
+                            setFilterRole('all');
+                        }}
+                        className="ml-auto text-xs font-bold text-primary hover:underline uppercase tracking-tight"
+                    >
+                        Reset Filters
+                    </button>
                 </div>
             </div>
 
@@ -205,59 +215,59 @@ export default function UserManagement() {
                         <table className="w-full min-w-[768px]">
                             <thead>
                                 <tr className="border-b border-gray-200">
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
-                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                                    <th className="text-center py-3 px-4 font-semibold text-gray-700 w-[120px]">Actions</th>
+                                    <th className="px-5 py-4 text-left font-semibold text-gray-700">Name</th>
+                                    <th className="px-5 py-4 text-left font-semibold text-gray-700">Email</th>
+                                    <th className="px-5 py-4 text-center font-semibold text-gray-700">Role</th>
+                                    <th className="px-5 py-4 text-center font-semibold text-gray-700">Status</th>
+                                    <th className="px-5 py-4 text-right font-semibold text-gray-700 w-[100px]">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-gray-50">
                                 {filteredUsers.map(user => (
-                                    <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                        <td className={`py-3 px-4 text-sm ${user.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                                    <tr key={user.id} className="group hover:bg-gray-50 transition-colors">
+                                        <td className={`px-5 py-4 text-sm ${user.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
                                             {user.name}
                                         </td>
-                                        <td className="py-3 px-4">
-                                            <div className="flex items-center gap-2 text-gray-600">
-                                                <Mail size={16} />
+                                        <td className="px-5 py-4">
+                                            <div className="flex items-center gap-2 text-gray-600 text-sm">
+                                                <Mail size={14} />
                                                 {user.email}
                                             </div>
                                         </td>
-                                        <td className="py-3 px-4">
-                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${user.role === 'admin'
+                                        <td className="px-5 py-4 text-center">
+                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin'
                                                 ? 'bg-purple-100 text-purple-700'
                                                 : 'bg-blue-100 text-blue-700'
                                                 }`}>
-                                                <Shield size={16} />
+                                                <Shield size={14} />
                                                 <span className="capitalize">{user.role}</span>
                                             </span>
                                         </td>
-                                        <td className="py-3 px-4">
+                                        <td className="px-5 py-4 text-center">
                                             {user.status === '1' ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
                                                     <CheckCircle size={14} />
                                                     Active
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
                                                     <XCircle size={14} />
                                                     Inactive
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="py-3 px-4 w-[120px]">
-                                            <div className="flex items-center justify-center gap-2">
+                                        <td className="px-5 py-4 text-right">
+                                            <div className="flex justify-end gap-1">
                                                 <button
                                                     onClick={() => handleEdit(user)}
-                                                    className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Edit User"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(user)}
-                                                    className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                     title="Delete User"
                                                 >
                                                     <Trash2 size={16} />

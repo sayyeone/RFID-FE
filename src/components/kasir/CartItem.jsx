@@ -14,28 +14,13 @@ export default function CartItem({ item }) {
         </p>
       </div>
 
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => updateQuantity(item.rfid_uid, item.quantity - 1)}
-          className="p-1.5 hover:bg-gray-200 rounded-md transition-colors"
-        >
-          <Minus size={16} className="text-gray-600" />
-        </button>
-        
-        <span className="w-8 text-center font-semibold">{item.quantity}</span>
-        
-        <button
-          onClick={() => updateQuantity(item.rfid_uid, item.quantity + 1)}
-          className="p-1.5 hover:bg-gray-200 rounded-md transition-colors"
-        >
-          <Plus size={16} className="text-gray-600" />
-        </button>
-
+      <div className="flex items-center">
         <button
           onClick={() => removeFromCart(item.rfid_uid)}
-          className="p-1.5 hover:bg-red-100 rounded-md transition-colors ml-2"
+          className="p-1.5 hover:bg-red-100 rounded-md transition-colors"
+          title="Remove Item"
         >
-          <Trash2 size={16} className="text-red-600" />
+          <Trash2 size={18} className="text-red-600" />
         </button>
       </div>
     </div>

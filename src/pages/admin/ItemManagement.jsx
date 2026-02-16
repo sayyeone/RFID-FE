@@ -194,7 +194,6 @@ export default function ItemManagement() {
                 <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-600">
                     <span className="whitespace-nowrap">Total: <strong>{totalItems}</strong></span>
                     <span className="whitespace-nowrap">Showing: <strong>{displayedItems.length}</strong> of {totalItems}</span>
-                    {/* Pagination Settings */}
                     <div className="flex items-center gap-2">
                         <span className="text-sm text-gray-500">Show</span>
                         <select
@@ -208,6 +207,16 @@ export default function ItemManagement() {
                             <option value={100}>100</option>
                         </select>
                     </div>
+
+                    <button
+                        onClick={() => {
+                            setSearchQuery('');
+                            setFilterKategori('all');
+                        }}
+                        className="ml-auto text-xs font-bold text-primary hover:underline uppercase tracking-tight"
+                    >
+                        Reset Filters
+                    </button>
                 </div>
             </div>
 
@@ -219,74 +228,71 @@ export default function ItemManagement() {
                         <p className="text-gray-500">Loading items...</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto -mx-4 sm:mx-0">
-                        <div className="inline-block min-w-full align-middle">
-                            <table className="w-full min-w-[768px]">
-                                <thead>
-                                    <tr className="border-b border-gray-200">
-                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Item Name</th>
-                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Category</th>
-                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Price</th>
-                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                                        <th className="text-center py-3 px-4 font-semibold text-gray-700">Actions</th>
+                    <div className="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100">
+                        <table className="w-full text-left">
+                            <thead>
+                                <tr className="border-b border-gray-200">
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">Item Name</th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">Category</th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">Price</th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700 text-center">Status</th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700 text-right w-[100px]">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-50">
+                                {displayedItems.map(item => (
+                                    <tr key={item.id} className="group hover:bg-gray-50 transition-colors">
+                                        <td className={`px-5 py-4 text-sm ${item.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                                            {item.nama_item}
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            {KATEGORI_CONFIG[item.kategori] && (() => {
+                                                const config = KATEGORI_CONFIG[item.kategori];
+                                                const IconComponent = config.icon;
+                                                return (
+                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                                                        <IconComponent size={14} />
+                                                        <span className="capitalize">{item.kategori}</span>
+                                                    </span>
+                                                );
+                                            })()}
+                                        </td>
+                                        <td className="px-5 py-4 text-sm text-gray-900 font-bold">Rp {item.harga.toLocaleString('id-ID')}</td>
+                                        <td className="px-5 py-4 text-center">
+                                            {item.status === '1' ? (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                                    <CheckCircle size={14} />
+                                                    Active
+                                                </span>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                                    <XCircle size={14} />
+                                                    Inactive
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="px-5 py-4 text-right">
+                                            <div className="flex justify-end gap-1">
+                                                <button
+                                                    onClick={() => handleEdit(item)}
+                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    title="Edit Item"
+                                                >
+                                                    <Edit2 size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(item)}
+                                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="Delete Item"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {displayedItems.map(item => (
-                                        <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                            <td className={`py-3 px-4 text-sm ${item.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
-                                                {item.nama_item}
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                {KATEGORI_CONFIG[item.kategori] && (() => {
-                                                    const config = KATEGORI_CONFIG[item.kategori];
-                                                    const IconComponent = config.icon;
-                                                    return (
-                                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${config.color}`}>
-                                                            <IconComponent size={16} />
-                                                            <span className="capitalize">{item.kategori}</span>
-                                                        </span>
-                                                    );
-                                                })()}
-                                            </td>
-                                            <td className="py-3 px-4 text-sm text-gray-600">Rp {item.harga.toLocaleString('id-ID')}</td>
-                                            <td className="py-3 px-4">
-                                                {item.status === '1' ? (
-                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        <CheckCircle size={14} />
-                                                        Active
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                        <XCircle size={14} />
-                                                        Inactive
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <button
-                                                        onClick={() => handleEdit(item)}
-                                                        className="text-blue-600 hover:text-blue-900 p-1.5 hover:bg-blue-50 rounded-lg transition-colors"
-                                                        title="Edit Item"
-                                                    >
-                                                        <Edit2 size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(item)}
-                                                        className="text-red-600 hover:text-red-900 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                                                        title="Delete Item"
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
 

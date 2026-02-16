@@ -68,9 +68,27 @@ export default function RecentTransactions({ transactions, loading }) {
                 <p className="font-bold text-primary text-sm sm:text-base">
                   Rp {transaction.total_amount.toLocaleString('id-ID')}
                 </p>
-                <p className="text-[10px] sm:text-xs text-gray-400">
-                  {transaction.items_count} items
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-[10px] sm:text-xs text-gray-400">
+                    {transaction.items_count || transaction.items?.length || 0} items
+                  </p>
+                  {(() => {
+                    const m = transaction.payment_type?.toLowerCase() || '';
+                    let config = { label: transaction.payment_type || 'N/A', color: 'bg-gray-100 text-gray-500' };
+
+                    if (m.includes('qris')) config = { label: 'QRIS', color: 'bg-emerald-100 text-emerald-700' };
+                    else if (['gopay', 'shopeepay', 'dana', 'linkaja', 'wallet'].some(w => m.includes(w))) config = { label: 'E-Wallet', color: 'bg-blue-100 text-blue-700' };
+                    else if (['bank_transfer', 'va', 'bca', 'bni', 'bri', 'mandiri', 'permata', 'echannel'].some(b => m.includes(b))) config = { label: 'Bank VA', color: 'bg-indigo-100 text-indigo-700' };
+                    else if (['cstore', 'alfamart', 'indomaret'].some(r => m.includes(r))) config = { label: 'Retail', color: 'bg-orange-100 text-orange-700' };
+                    else if (['akulaku', 'kredivo'].some(p => m.includes(p))) config = { label: 'PayLater', color: 'bg-violet-100 text-violet-700' };
+
+                    return (
+                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider ${config.color}`}>
+                        {config.label}
+                      </span>
+                    );
+                  })()}
+                </div>
               </div>
             </div>
           ))}

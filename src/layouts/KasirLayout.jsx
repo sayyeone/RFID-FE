@@ -16,7 +16,7 @@ export default function KasirLayout() {
     // Auto-open sidebar on desktop
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth >= 768) {
+            if (window.innerWidth >= 1024) {
                 setSidebarOpen(true);
             } else {
                 setSidebarOpen(false);
@@ -50,10 +50,14 @@ export default function KasirLayout() {
     };
 
     const menuItems = [
-        { path: '/kasir/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
         { path: '/kasir/pos', icon: ShoppingCart, label: 'Point of Sale' },
         { path: '/kasir/history', icon: History, label: 'Transaction History' }
     ];
+
+    const getPageTitle = (path) => {
+        const item = menuItems.find(i => i.path === path);
+        return item ? item.label : 'Dashboard';
+    };
 
     const isActive = (path) => location.pathname === path;
 
@@ -98,7 +102,7 @@ export default function KasirLayout() {
                                 key={item.path}
                                 to={item.path}
                                 onClick={() => {
-                                    if (window.innerWidth < 768) {
+                                    if (window.innerWidth < 1024) {
                                         setSidebarOpen(false);
                                     }
                                 }}
@@ -115,51 +119,41 @@ export default function KasirLayout() {
                 </div>
             </aside>
 
-            {/* Mobile Overlay */}
+            {/* Sidebar Overlay (Darker & Blur) */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/50 z-30"
+                    className="fixed inset-0 bg-black/60 backdrop-blur-md z-30 animate-in fade-in duration-300"
                     onClick={() => setSidebarOpen(false)}
                     aria-label="Close sidebar"
                 />
             )}
 
             {/* Main Content Wrapper */}
-            <div
-                className="flex-1 flex flex-col transition-all duration-300 min-w-0"
-                style={{
-                    marginLeft: '0',
-                }}
-            >
+            <div className="flex-1 flex flex-col min-w-0">
                 {/* Floating Navbar */}
                 <div className="px-4 pt-4 md:px-8 md:pt-4 sticky top-0 z-20">
                     <header className="h-16 bg-white/90 backdrop-blur-lg rounded-2xl shadow-lg shadow-gray-200/50 flex items-center justify-between px-4 md:px-6">
-                        {/* Left: Sidebar toggle button */}
-                        <button
-                            onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-600"
-                            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
-                        >
-                            <Menu size={20} />
-                        </button>
+                        <div className="flex items-center gap-3">
+                            <button
+                                onClick={() => setSidebarOpen(!sidebarOpen)}
+                                className="p-2 hover:bg-gray-100 rounded-xl transition-all text-gray-600"
+                            >
+                                <Menu size={20} />
+                            </button>
+                        </div>
 
                         {/* Right: User Profile Dropdown */}
                         <div className="ml-auto flex items-center gap-2">
-
                             <div className="relative" ref={dropdownRef}>
                                 <button
                                     onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                                    className="flex items-center gap-3 p-1 hover:bg-gray-100 rounded-2xl transition-all group"
+                                    className="flex items-center gap-3 p-1 hover:bg-gray-100 rounded-xl transition-all group"
                                 >
                                     <div className="relative">
                                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-600 text-white flex items-center justify-center font-bold shadow-md border-2 border-white overflow-hidden ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
                                             {user?.name?.charAt(0).toUpperCase() || 'K'}
                                         </div>
                                         <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white rounded-full" />
-                                    </div>
-                                    <div className="hidden sm:block text-left">
-                                        <p className="text-sm font-bold text-gray-800 leading-tight group-hover:text-primary transition-colors">{user?.name || 'Kasir'}</p>
-                                        <p className="text-[10px] text-gray-400 uppercase tracking-widest font-bold leading-tight">{user?.role || 'kasir'}</p>
                                     </div>
                                     <ChevronDown size={14} className={`text-gray-400 transition-transform ${profileDropdownOpen ? 'rotate-180' : ''}`} />
                                 </button>
