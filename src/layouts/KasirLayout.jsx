@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, History, LogOut, Menu, X, LayoutDashboard, ChevronDown, User } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import AlertModal from '../components/common/AlertModal';
 
 export default function KasirLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+    const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -39,10 +41,12 @@ export default function KasirLayout() {
     }, []);
 
     const handleLogout = () => {
-        if (window.confirm('Are you sure you want to logout?')) {
-            logout();
-            navigate('/login');
-        }
+        setLogoutAlertOpen(true);
+    };
+
+    const confirmLogout = () => {
+        logout();
+        navigate('/login');
     };
 
     const menuItems = [
@@ -141,10 +145,6 @@ export default function KasirLayout() {
 
                         {/* Right: User Profile Dropdown */}
                         <div className="ml-auto flex items-center gap-2">
-                            <div className="hidden lg:flex items-center gap-1 px-3 py-1.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-600">
-                                <span>Star</span>
-                                <span className="px-1.5 bg-white rounded border border-gray-200">99+</span>
-                            </div>
 
                             <div className="relative" ref={dropdownRef}>
                                 <button
@@ -218,6 +218,14 @@ export default function KasirLayout() {
                     </div>
                 </main>
             </div>
+            <AlertModal
+                isOpen={logoutAlertOpen}
+                onClose={() => setLogoutAlertOpen(false)}
+                onConfirm={confirmLogout}
+                title="Confirm Logout"
+                message="Are you sure you want to log out from the system?"
+                type="danger"
+            />
         </div>
     );
 }

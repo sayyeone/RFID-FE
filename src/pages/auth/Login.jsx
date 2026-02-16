@@ -39,8 +39,8 @@ export default function Login() {
     if (loading) return;
 
     // client validation
-    if (password.length > 0 && password.length < 6) {
-      setError('Password must be at least 6 characters');
+    if (password.length > 0 && password.length < 5) {
+      setError('Password must be at least 5 characters');
       return;
     }
 
@@ -218,15 +218,7 @@ export default function Login() {
                 <label htmlFor="password" className="block text-sm font-semibold text-[#566a7f] uppercase tracking-wide">
                   Password
                 </label>
-                <a
-                  href="#"
-                  className={`text-sm font-medium transition-all ${showResetPrompt
-                    ? 'text-red-500 hover:text-red-600 animate-pulse font-bold'
-                    : 'text-primary hover:text-[#5f61e6]'
-                    }`}
-                >
-                  {showResetPrompt ? 'Lupa Password?' : 'Forgot Password?'}
-                </a>
+                
               </div>
               <div className="relative">
                 <input
@@ -249,9 +241,9 @@ export default function Login() {
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </button>
               </div>
-              {password.length > 0 && password.length <= 6 && (
+              {password.length > 0 && password.length <= 5 && (
                 <p className="text-red-500 text-xs mt-1.5">
-                  Password must be more than 6 characters
+                  Password must be more than 5 characters
                 </p>
               )}
 
@@ -273,19 +265,6 @@ export default function Login() {
               )}
             </div>
 
-            {/* Remember Me */}
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="remember-me"
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 rounded border-[#d9dee3] text-primary focus:ring-primary focus:ring-offset-0 cursor-pointer"
-              />
-              <label htmlFor="remember-me" className="ml-2.5 text-sm text-[#697a8d] select-none cursor-pointer hover:text-[#566a7f]">
-                Remember Me
-              </label>
-            </div>
 
             {/* Submit Button */}
             <button

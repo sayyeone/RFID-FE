@@ -2,10 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Package, Users, LogOut, Menu, X, Layers, ChevronDown, User } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
+import AlertModal from '../components/common/AlertModal';
 
 export default function AdminLayout() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+    const [logoutAlertOpen, setLogoutAlertOpen] = useState(false);
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -39,10 +41,12 @@ export default function AdminLayout() {
     }, []);
 
     const handleLogout = () => {
-        if (window.confirm('Are you sure you want to logout?')) {
-            logout();
-            navigate('/login');
-        }
+        setLogoutAlertOpen(true);
+    };
+
+    const confirmLogout = () => {
+        logout();
+        navigate('/login');
     };
 
     const menuItems = [
@@ -214,6 +218,14 @@ export default function AdminLayout() {
                     </div>
                 </main>
             </div>
+            <AlertModal
+                isOpen={logoutAlertOpen}
+                onClose={() => setLogoutAlertOpen(false)}
+                onConfirm={confirmLogout}
+                title="Confirm Logout"
+                message="Are you sure you want to log out from the system?"
+                type="danger"
+            />
         </div>
     );
 }

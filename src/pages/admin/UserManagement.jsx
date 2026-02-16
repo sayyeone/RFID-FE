@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Search, Mail, Shield, Edit2, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import { Users, Plus, Search, Mail, Shield, Edit2, Trash2, CheckCircle, XCircle, Eye, EyeOff } from 'lucide-react';
 import api from '../../api/axiosConfig';
 import AlertModal from '../../components/common/AlertModal';
 
@@ -117,7 +117,17 @@ export default function UserManagement() {
             setShowForm(false);
             fetchUsers();
         } catch (err) {
-            showAlert('Gagal Menyimpan', 'Terjadi kesalahan: ' + (err.response?.data?.message || 'Error tidak diketahui'), 'error');
+            const errorData = err.response?.data;
+            let detailMsg = '';
+
+            if (errorData?.errors) {
+                // Flatten validation errors into a single string
+                detailMsg = Object.values(errorData.errors).flat().join(', ');
+            } else {
+                detailMsg = errorData?.message || 'Error tidak diketahui';
+            }
+
+            showAlert('Gagal Menyimpan', 'Terjadi kesalahan: ' + detailMsg, 'error');
         }
     };
 
@@ -169,19 +179,17 @@ export default function UserManagement() {
                 <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-600">
                     <span className="whitespace-nowrap">Total: <strong>{totalItems}</strong></span>
                     <span className="whitespace-nowrap">Showing: <strong>{filteredUsers.length}</strong> of {totalItems}</span>
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Show</span>
-                        <select
-                            value={perPage}
-                            onChange={(e) => setPerPage(Number(e.target.value))}
-                            className="px-2 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 outline-none"
-                        >
-                            <option value={10}>10</option>
-                            <option value={25}>25</option>
-                            <option value={50}>50</option>
-                            <option value={100}>100</option>
-                        </select>
-                    </div>
+                    <span className="whitespace-nowrap">Show</span>
+                    <select
+                        value={perPage}
+                        onChange={(e) => setPerPage(Number(e.target.value))}
+                        className="text-sm border border-gray-300 rounded-lg px-3 py-1 outline-none focus:ring-2 focus:ring-purple-500"
+                    >
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                    </select>
                 </div>
             </div>
 
@@ -193,75 +201,73 @@ export default function UserManagement() {
                         <p className="text-gray-500">Loading users...</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto -mx-4 sm:mx-0">
-                        <div className="inline-block min-w-full align-middle">
-                            <table className="w-full min-w-[768px]">
-                                <thead>
-                                    <tr className="border-b border-gray-200">
-                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
-                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
-                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
-                                        <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                                        <th className="text-center py-3 px-4 font-semibold text-gray-700">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredUsers.map(user => (
-                                        <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                            <td className={`py-3 px-4 text-sm ${user.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
-                                                {user.name}
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <div className="flex items-center gap-2 text-gray-600">
-                                                    <Mail size={16} />
-                                                    {user.email}
-                                                </div>
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${user.role === 'admin'
-                                                    ? 'bg-purple-100 text-purple-700'
-                                                    : 'bg-blue-100 text-blue-700'
-                                                    }`}>
-                                                    <Shield size={16} />
-                                                    <span className="capitalize">{user.role}</span>
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[768px]">
+                            <thead>
+                                <tr className="border-b border-gray-200">
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Name</th>
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
+                                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
+                                    <th className="text-center py-3 px-4 font-semibold text-gray-700 w-[120px]">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredUsers.map(user => (
+                                    <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                        <td className={`py-3 px-4 text-sm ${user.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                                            {user.name}
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <div className="flex items-center gap-2 text-gray-600">
+                                                <Mail size={16} />
+                                                {user.email}
+                                            </div>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium ${user.role === 'admin'
+                                                ? 'bg-purple-100 text-purple-700'
+                                                : 'bg-blue-100 text-blue-700'
+                                                }`}>
+                                                <Shield size={16} />
+                                                <span className="capitalize">{user.role}</span>
+                                            </span>
+                                        </td>
+                                        <td className="py-3 px-4">
+                                            {user.status === '1' ? (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                    <CheckCircle size={14} />
+                                                    Active
                                                 </span>
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                {user.status === '1' ? (
-                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                        <CheckCircle size={14} />
-                                                        Active
-                                                    </span>
-                                                ) : (
-                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                                                        <XCircle size={14} />
-                                                        Inactive
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td className="py-3 px-4">
-                                                <div className="flex items-center justify-center gap-2">
-                                                    <button
-                                                        onClick={() => handleEdit(user)}
-                                                        className="text-blue-600 hover:text-blue-900 p-1.5 hover:bg-blue-50 rounded-lg transition-colors"
-                                                        title="Edit User"
-                                                    >
-                                                        <Edit2 size={18} />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(user)}
-                                                        className="text-red-600 hover:text-red-900 p-1.5 hover:bg-red-50 rounded-lg transition-colors"
-                                                        title="Delete User"
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                            ) : (
+                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                    <XCircle size={14} />
+                                                    Inactive
+                                                </span>
+                                            )}
+                                        </td>
+                                        <td className="py-3 px-4 w-[120px]">
+                                            <div className="flex items-center justify-center gap-2">
+                                                <button
+                                                    onClick={() => handleEdit(user)}
+                                                    className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    title="Edit User"
+                                                >
+                                                    <Edit2 size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(user)}
+                                                    className="text-red-600 hover:text-red-900 p-2 hover:bg-red-50 rounded-lg transition-colors"
+                                                    title="Delete User"
+                                                >
+                                                    <Trash2 size={16} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
                     </div>
                 )}
 
@@ -314,6 +320,7 @@ export default function UserManagement() {
 
 // UserForm Component
 function UserForm({ user, onSubmit, onClose }) {
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -336,6 +343,12 @@ function UserForm({ user, onSubmit, onClose }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Validation for new user or password change
+        if ((!user && formData.password.length < 6) || (formData.password && formData.password.length < 6)) {
+            alert('Password must be at least 6 characters long!');
+            return;
+        }
 
         // If editing and password is empty, remove it from payload
         const payload = { ...formData };
@@ -389,14 +402,26 @@ function UserForm({ user, onSubmit, onClose }) {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             Password {user ? '(leave blank to keep current)' : '*'}
                         </label>
-                        <input
-                            type="password"
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
-                            placeholder="••••••••"
-                            required={!user}
-                        />
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                                placeholder="••••••••"
+                                required={!user}
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                            >
+                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </button>
+                        </div>
+                        {formData.password && formData.password.length < 6 && (
+                            <p className="text-red-500 text-xs mt-1">Status: Password too short (min. 6 characters)</p>
+                        )}
                     </div>
 
                     <div>
