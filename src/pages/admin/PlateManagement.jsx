@@ -225,7 +225,7 @@ export default function PlateManagement() {
       </div>
 
       {/* Table */}
-      <div className="card">
+      <div className="card !p-0 overflow-hidden">
         <PlateTable
           plates={filteredPlates}
           onEdit={handleEdit}
@@ -233,9 +233,9 @@ export default function PlateManagement() {
           loading={loading}
         />
 
-        {/* Pagination Controls */}
+        {/* Pagination Controls - Matching History Style */}
         {totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-6 border-t border-gray-100 bg-gray-50/50">
             <p className="text-sm text-gray-600 text-center sm:text-left">
               Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
             </p>
@@ -243,14 +243,14 @@ export default function PlateManagement() {
               <button
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(prev => prev - 1)}
-                className="flex-1 sm:flex-none px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 sm:flex-none px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
               >
                 Previous
               </button>
               <button
                 disabled={currentPage === totalPages}
                 onClick={() => setCurrentPage(prev => prev + 1)}
-                className="flex-1 sm:flex-none px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 sm:flex-none px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium shadow-sm shadow-purple-200"
               >
                 Next
               </button>

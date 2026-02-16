@@ -12,8 +12,49 @@ export default function KasirLayout() {
     const navigate = useNavigate();
     const location = useLocation();
     const dropdownRef = useRef(null);
+    const mainContentRef = useRef(null);
 
-    // Auto-open sidebar on desktop
+    // Auto-focus logic on route change using MutationObserver
+    useEffect(() => {
+        const attemptFocus = () => {
+            const autoFocusInput = mainContentRef.current?.querySelector('input[data-autofocus="true"]');
+            if (autoFocusInput) {
+                autoFocusInput.focus({ preventScroll: true });
+                return true;
+            }
+            return false;
+        };
+
+        // If not immediately found, watch for changes
+        if (!attemptFocus()) {
+            const observer = new MutationObserver(() => {
+                if (attemptFocus()) {
+                    observer.disconnect();
+                }
+            });
+
+            if (mainContentRef.current) {
+                observer.observe(mainContentRef.current, { childList: true, subtree: true });
+            }
+
+            // Fallback timeout to stop observing after 2 seconds
+            const timeout = setTimeout(() => {
+                observer.disconnect();
+                if (!document.activeElement || document.activeElement === document.body) {
+                    mainContentRef.current?.focus({ preventScroll: true });
+                }
+            }, 2000);
+
+            return () => {
+                observer.disconnect();
+                clearTimeout(timeout);
+            };
+        }
+    }, [location.pathname]);
+
+    // Auto-open sidebar on desktop - DISABLED per user request (drawer mode)
+    // Sidebar should only open on demand.
+    /*
     useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth >= 1024) {
@@ -27,6 +68,7 @@ export default function KasirLayout() {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+    */
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -68,9 +110,10 @@ export default function KasirLayout() {
                 className={`
                     fixed left-0 top-0 h-screen
                     bg-white border-r border-gray-200
-                    transition-all duration-300 z-40
+                    transition-all duration-300 z-40 outline-none
                     ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
                 `}
+                tabIndex="-1"
                 style={{
                     width: '280px',
                 }}
@@ -122,7 +165,7 @@ export default function KasirLayout() {
             {/* Sidebar Overlay (Darker & Blur) */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/60 backdrop-blur-md z-30 animate-in fade-in duration-300"
+                    className="fixed inset-0 bg-black/30 backdrop-blur-sm z-30 animate-in fade-in duration-300"
                     onClick={() => setSidebarOpen(false)}
                     aria-label="Close sidebar"
                 />
@@ -206,7 +249,11 @@ export default function KasirLayout() {
                 </div>
 
                 {/* Main Content Area */}
-                <main className="flex-1 overflow-y-auto">
+                <main
+                    ref={mainContentRef}
+                    className="flex-1 overflow-y-auto outline-none"
+                    tabIndex="-1"
+                >
                     <div className="p-4 md:p-8">
                         <Outlet />
                     </div>

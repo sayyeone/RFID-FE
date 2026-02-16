@@ -115,13 +115,27 @@ export default function TransactionList({ transactions, onViewDetail, loading })
       <table className="w-full text-left">
         <thead>
           <tr className="border-b border-gray-200">
-            <th className="px-5 py-4 text-sm font-semibold text-gray-700">Order ID</th>
-            <th className="px-5 py-4 text-sm font-semibold text-gray-700">Date & Time</th>
-            <th className="px-5 py-4 text-sm font-semibold text-gray-700">Items</th>
-            <th className="px-5 py-4 text-sm font-semibold text-gray-700 text-right">Total</th>
-            <th className="px-5 py-4 text-sm font-semibold text-gray-700 text-center">Status</th>
-            <th className="px-5 py-4 text-sm font-semibold text-gray-700 text-center">Method</th>
-            <th className="px-5 py-4 text-sm font-semibold text-gray-700 text-right w-[100px]">Actions</th>
+            <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+              <div className="flex justify-start">Order ID</div>
+            </th>
+            <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+              <div className="flex justify-center">Date & Time</div>
+            </th>
+            <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+              <div className="flex justify-center">Items</div>
+            </th>
+            <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+              <div className="flex justify-center">Total</div>
+            </th>
+            <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+              <div className="flex justify-center">Status</div>
+            </th>
+            <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+              <div className="flex justify-center">Method</div>
+            </th>
+            <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+              <div className="flex justify-center">Actions</div>
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50">
@@ -132,38 +146,50 @@ export default function TransactionList({ transactions, onViewDetail, loading })
               className="group hover:bg-gray-50 transition-colors cursor-pointer"
             >
               <td className="px-5 py-4">
-                <span className="text-sm font-medium text-gray-400 font-mono">
-                  #{transaction.order_id || transaction.id.slice(0, 8)}
-                </span>
+                <div className="flex justify-start">
+                  <span className="text-sm font-medium text-gray-400 font-mono">
+                    #{transaction.order_id || transaction.id.slice(0, 8)}
+                  </span>
+                </div>
               </td>
               <td className="px-5 py-4 whitespace-nowrap">
-                <div className="flex flex-col">
-                  <span className="text-sm font-semibold text-gray-900">
-                    {new Date(transaction.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </span>
-                  <span className="text-[11px] text-gray-400">
-                    {new Date(transaction.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                <div className="flex justify-center">
+                  <div className="flex flex-col">
+                    <span className="text-sm font-semibold text-gray-900">
+                      {new Date(transaction.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                    <span className="text-[11px] text-gray-400">
+                      {new Date(transaction.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+              </td>
+              <td className="px-5 py-4">
+                <div className="flex justify-center">
+                  <span className="text-sm text-gray-900 font-medium">
+                    {transaction.items?.length || 0}
                   </span>
                 </div>
               </td>
               <td className="px-5 py-4">
-                <span className="text-sm text-gray-900 font-medium">
-                  {transaction.items?.length || 0}
-                </span>
+                <div className="flex justify-center">
+                  <span className="text-sm font-bold text-gray-900">
+                    Rp {(transaction.total_amount || transaction.total_harga).toLocaleString('id-ID')}
+                  </span>
+                </div>
               </td>
-              <td className="px-5 py-4 text-right">
-                <span className="text-sm font-bold text-gray-900">
-                  Rp {(transaction.total_amount || transaction.total_harga).toLocaleString('id-ID')}
-                </span>
+              <td className="px-5 py-4">
+                <div className="flex justify-center">
+                  {getStatusBadge(transaction.status)}
+                </div>
               </td>
-              <td className="px-5 py-4 text-center">
-                {getStatusBadge(transaction.status)}
+              <td className="px-5 py-4">
+                <div className="flex justify-center">
+                  {getPaymentBadge(transaction.payment_type)}
+                </div>
               </td>
-              <td className="px-5 py-4 text-center">
-                {getPaymentBadge(transaction.payment_type)}
-              </td>
-              <td className="px-5 py-4 text-right">
-                <div className="flex justify-end">
+              <td className="px-5 py-4">
+                <div className="flex justify-center">
                   <button
                     className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-all"
                     aria-label="View Details"

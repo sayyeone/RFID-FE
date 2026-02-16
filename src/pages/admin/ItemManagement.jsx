@@ -221,7 +221,7 @@ export default function ItemManagement() {
             </div>
 
             {/* Table */}
-            <div className="card">
+            <div className="card !p-0 overflow-hidden">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-12">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
@@ -232,57 +232,81 @@ export default function ItemManagement() {
                         <table className="w-full text-left">
                             <thead>
                                 <tr className="border-b border-gray-200">
-                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">Item Name</th>
-                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">Category</th>
-                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">Price</th>
-                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700 text-center">Status</th>
-                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700 text-right w-[100px]">Actions</th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-center">Item Name</div>
+                                    </th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-center">Category</div>
+                                    </th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-end">Price</div>
+                                    </th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-center">Status</div>
+                                    </th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-center">Actions</div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {displayedItems.map(item => (
                                     <tr key={item.id} className="group hover:bg-gray-50 transition-colors">
-                                        <td className={`px-5 py-4 text-sm ${item.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
-                                            {item.nama_item}
+                                        <td className="px-5 py-4">
+                                            <div className="flex justify-center">
+                                                <span className={`text-sm ${item.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                                                    {item.nama_item}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-5 py-4">
-                                            {KATEGORI_CONFIG[item.kategori] && (() => {
-                                                const config = KATEGORI_CONFIG[item.kategori];
-                                                const IconComponent = config.icon;
-                                                return (
-                                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${config.color}`}>
-                                                        <IconComponent size={14} />
-                                                        <span className="capitalize">{item.kategori}</span>
+                                            <div className="flex justify-center">
+                                                {KATEGORI_CONFIG[item.kategori] && (() => {
+                                                    const config = KATEGORI_CONFIG[item.kategori];
+                                                    const IconComponent = config.icon;
+                                                    return (
+                                                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${config.color}`}>
+                                                            <IconComponent size={14} />
+                                                            <span className="capitalize">{item.kategori}</span>
+                                                        </span>
+                                                    );
+                                                })()}
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <div className="flex justify-end">
+                                                <span className="text-sm text-gray-900 font-bold whitespace-nowrap">
+                                                    Rp {item.harga.toLocaleString('id-ID')}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <div className="flex justify-center">
+                                                {item.status === '1' ? (
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                                        <CheckCircle size={14} />
+                                                        ACTIVE
                                                     </span>
-                                                );
-                                            })()}
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                                        <XCircle size={14} />
+                                                        INACTIVE
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
-                                        <td className="px-5 py-4 text-sm text-gray-900 font-bold">Rp {item.harga.toLocaleString('id-ID')}</td>
-                                        <td className="px-5 py-4 text-center">
-                                            {item.status === '1' ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                                    <CheckCircle size={14} />
-                                                    Active
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                                                    <XCircle size={14} />
-                                                    Inactive
-                                                </span>
-                                            )}
-                                        </td>
-                                        <td className="px-5 py-4 text-right">
-                                            <div className="flex justify-end gap-1">
+                                        <td className="px-5 py-4">
+                                            <div className="flex justify-center gap-2">
                                                 <button
                                                     onClick={() => handleEdit(item)}
-                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Edit Item"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(item)}
-                                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                     title="Delete Item"
                                                 >
                                                     <Trash2 size={16} />
@@ -296,9 +320,9 @@ export default function ItemManagement() {
                     </div>
                 )}
 
-                {/* Pagination */}
+                {/* Pagination Controls - Matching History Style */}
                 {totalPages > 1 && (
-                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-6 border-t border-gray-200">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-6 border-t border-gray-100 bg-gray-50/50">
                         <p className="text-sm text-gray-600 text-center sm:text-left">
                             Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
                         </p>
@@ -306,14 +330,14 @@ export default function ItemManagement() {
                             <button
                                 disabled={currentPage === 1}
                                 onClick={() => setCurrentPage(prev => prev - 1)}
-                                className="flex-1 sm:flex-none px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="flex-1 sm:flex-none px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                             >
                                 Previous
                             </button>
                             <button
                                 disabled={currentPage === totalPages}
                                 onClick={() => setCurrentPage(prev => prev + 1)}
-                                className="flex-1 sm:flex-none px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="flex-1 sm:flex-none px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium shadow-sm shadow-purple-200"
                             >
                                 Next
                             </button>

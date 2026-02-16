@@ -53,6 +53,7 @@ export default function RfidScanner() {
             placeholder="Type UID here (e.g., A001, B002, C003)"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-lg font-mono"
             disabled={loading}
+            data-autofocus="true"
           />
         </div>
 

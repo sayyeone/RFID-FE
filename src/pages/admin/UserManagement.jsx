@@ -204,70 +204,88 @@ export default function UserManagement() {
             </div>
 
             {/* Table */}
-            <div className="card">
+            <div className="card !p-0 overflow-hidden">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-12">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mb-4"></div>
                         <p className="text-gray-500">Loading users...</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full min-w-[768px]">
+                    <div className="overflow-x-auto bg-white rounded-xl shadow-sm border border-gray-100">
+                        <table className="w-full text-left min-w-[768px]">
                             <thead>
                                 <tr className="border-b border-gray-200">
-                                    <th className="px-5 py-4 text-left font-semibold text-gray-700">Name</th>
-                                    <th className="px-5 py-4 text-left font-semibold text-gray-700">Email</th>
-                                    <th className="px-5 py-4 text-center font-semibold text-gray-700">Role</th>
-                                    <th className="px-5 py-4 text-center font-semibold text-gray-700">Status</th>
-                                    <th className="px-5 py-4 text-right font-semibold text-gray-700 w-[100px]">Actions</th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-start">Name</div>
+                                    </th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-start">Email</div>
+                                    </th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-center">Role</div>
+                                    </th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-center">Status</div>
+                                    </th>
+                                    <th className="px-5 py-4 text-sm font-semibold text-gray-700">
+                                        <div className="flex justify-center">Actions</div>
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
                                 {filteredUsers.map(user => (
                                     <tr key={user.id} className="group hover:bg-gray-50 transition-colors">
-                                        <td className={`px-5 py-4 text-sm ${user.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
-                                            {user.name}
+                                        <td className="px-5 py-4">
+                                            <div className="flex justify-start">
+                                                <span className={`text-sm ${user.status === '1' ? 'font-semibold text-gray-900' : 'text-gray-500'}`}>
+                                                    {user.name}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-5 py-4">
-                                            <div className="flex items-center gap-2 text-gray-600 text-sm">
+                                            <div className="flex justify-start gap-2 text-gray-600 text-sm">
                                                 <Mail size={14} />
                                                 {user.email}
                                             </div>
                                         </td>
                                         <td className="px-5 py-4 text-center">
-                                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin'
-                                                ? 'bg-purple-100 text-purple-700'
-                                                : 'bg-blue-100 text-blue-700'
-                                                }`}>
-                                                <Shield size={14} />
-                                                <span className="capitalize">{user.role}</span>
-                                            </span>
-                                        </td>
-                                        <td className="px-5 py-4 text-center">
-                                            {user.status === '1' ? (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                                    <CheckCircle size={14} />
-                                                    Active
+                                            <div className="flex justify-center">
+                                                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin'
+                                                    ? 'bg-purple-100 text-purple-700'
+                                                    : 'bg-blue-100 text-blue-700'
+                                                    }`}>
+                                                    <Shield size={14} />
+                                                    <span className="uppercase">{user.role}</span>
                                                 </span>
-                                            ) : (
-                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
-                                                    <XCircle size={14} />
-                                                    Inactive
-                                                </span>
-                                            )}
+                                            </div>
                                         </td>
-                                        <td className="px-5 py-4 text-right">
-                                            <div className="flex justify-end gap-1">
+                                        <td className="px-5 py-4">
+                                            <div className="flex justify-center">
+                                                {user.status === '1' ? (
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                                        <CheckCircle size={14} />
+                                                        ACTIVE
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                                        <XCircle size={14} />
+                                                        INACTIVE
+                                                    </span>
+                                                )}
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4">
+                                            <div className="flex justify-center gap-2">
                                                 <button
                                                     onClick={() => handleEdit(user)}
-                                                    className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                                     title="Edit User"
                                                 >
                                                     <Edit2 size={16} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDelete(user)}
-                                                    className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                                     title="Delete User"
                                                 >
                                                     <Trash2 size={16} />
@@ -281,9 +299,9 @@ export default function UserManagement() {
                     </div>
                 )}
 
-                {/* Pagination */}
+                {/* Pagination Controls - Matching History Style */}
                 {totalPages > 1 && (
-                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 pt-6 border-t border-gray-200">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-4 p-6 border-t border-gray-100 bg-gray-50/50">
                         <p className="text-sm text-gray-600 text-center sm:text-left">
                             Page <strong>{currentPage}</strong> of <strong>{totalPages}</strong>
                         </p>
@@ -291,14 +309,14 @@ export default function UserManagement() {
                             <button
                                 disabled={currentPage === 1}
                                 onClick={() => setCurrentPage(prev => prev - 1)}
-                                className="flex-1 sm:flex-none px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="flex-1 sm:flex-none px-4 py-2 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium"
                             >
                                 Previous
                             </button>
                             <button
                                 disabled={currentPage === totalPages}
                                 onClick={() => setCurrentPage(prev => prev + 1)}
-                                className="flex-1 sm:flex-none px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="flex-1 sm:flex-none px-4 py-2 bg-purple-600 text-white hover:bg-purple-700 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium shadow-sm shadow-purple-200"
                             >
                                 Next
                             </button>

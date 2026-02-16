@@ -42,13 +42,19 @@ export default function AlertModal({
             btnColor: 'bg-blue-500 hover:bg-blue-600',
             bgColor: 'bg-blue-50',
             borderColor: 'border-blue-100'
+        },
+        danger: {
+            icon: <AlertCircle className="text-red-500" size={48} />,
+            btnColor: 'bg-red-500 hover:bg-red-600',
+            bgColor: 'bg-red-50',
+            borderColor: 'border-red-100'
         }
     };
 
     const config = typeConfig[type] || typeConfig.info;
 
     return (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 transition-all animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 transition-all animate-in fade-in duration-200">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden transform transition-all animate-in zoom-in-95 duration-200">
                 <div className={`p-8 flex flex-col items-center text-center ${config.bgColor} border-b ${config.borderColor}`}>
                     <div className="mb-4">
@@ -59,7 +65,7 @@ export default function AlertModal({
                 </div>
 
                 <div className="p-4 bg-white flex items-center justify-center gap-3">
-                    {type === 'confirm' && (
+                    {(type === 'confirm' || type === 'danger') && (
                         <button
                             onClick={onClose}
                             className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
