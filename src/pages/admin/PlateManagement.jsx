@@ -157,14 +157,18 @@ export default function PlateManagement() {
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-row items-center justify-between mb-6">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
           <Package size={32} className="text-primary flex-shrink-0" />
           <div className="min-w-0">
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-800">Plate Management</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Plate Management</h1>
             <p className="text-gray-500 text-sm">Manage RFID plates and pricing</p>
           </div>
         </div>
+        <button onClick={handleCreate} className="btn-primary whitespace-nowrap flex items-center gap-2">
+          <Plus size={20} />
+          <span className="hidden md:inline">Add Plate</span>
+        </button>
       </div>
 
       {/* Filters */}
