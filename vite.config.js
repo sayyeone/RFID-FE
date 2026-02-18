@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       proxy: {
         '/api': {
-          target: 'http://127.0.0.1:8000',
+          target: 'https://sistem-penghitungan-piring-menggunakan-rfid-production.up.railway.app',
           changeOrigin: true,
         }
       }
