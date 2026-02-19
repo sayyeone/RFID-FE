@@ -1,7 +1,7 @@
 # RFID-FE
 A modern, intelligent Point of Sale (POS) frontend for the Smart Plate System. Built with React and TailwindCSS, featuring zero-click RFID scanning, real-time data visualization, and seamless Midtrans payment integration.
 
-**Live Demo:** [RFID-FE on Vercel](https://rfid-fe.vercel.app) *(Coming Soon)*
+**Live Demo:** [RFID-FE on Vercel](https://rfid-8f5e3tai5-sayyeones-projects.vercel.app/)
 
 ## What's This?
 This is the **Frontend** component of the **Sistem Penghitungan Piring Otomatis**. It provides a sleek, responsive interface for cashiers to manage transactions and for admins to monitor sales performance. 
